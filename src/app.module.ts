@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { FormModule } from './form/form.module';
 
 @Module({
   imports: [
@@ -10,7 +11,8 @@ import { MongooseModule } from '@nestjs/mongoose';
       isGlobal: true,
 
     }),
-    MongooseModule.forRoot('mongodb://localhost:27017/quantum-backend'),
+    MongooseModule.forRoot('mongodb+srv://paritosh142:Password@data.iv962.mongodb.net/?retryWrites=true&w=majority&appName=Data'),
+    FormModule,
   ],
   controllers: [AppController],
   providers: [AppService],
