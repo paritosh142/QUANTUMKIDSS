@@ -17,6 +17,7 @@ export class FormController {
       return {
         message: 'Form submitted successfully!',
         uuid: result.uuid,
+        customId:result.customId,
         data: result,
       };
     } catch (error) {
@@ -31,12 +32,12 @@ export class FormController {
   @ApiOperation({ summary: 'Grt all Data' })
   @ApiResponse({ status: 200, description: 'Form Data retrieved successfully!' })
   async getAllForms(
-    @Query('offset') offset: number,
-    @Query('pageSize') pageSize: number
+    @Query('offset') offset: string,
+    @Query('pageSize') pageSize: string
   ) {
     return {
       message: 'Form submissions retrieved successfully!',
-      data: await this.formService.getSubmissions(offset, pageSize),
+      data: await this.formService.getSubmissions(offset ,pageSize),
     };
   }
   // @Get('status')
@@ -55,10 +56,10 @@ export class FormController {
   @ApiResponse({ status: 200, description: 'Form submissions with the specified status retrieved successfully!' })
   async getFormsByStatus(
     @Query('status') status: string,
-    @Query('offset') offset: number,
-    @Query('pageSize') pageSize: number
+    @Query('offset') offset: string,
+    @Query('pageSize') pageSize: string
   ) {
-    const { data, totalCount } = await this.formService.getSubmissionsByStatus(status, offset, pageSize);
+    const { data, totalCount } = await this.formService.getSubmissionsByStatus(status , offset , pageSize);
     return {
       message: `Form submissions with status '${status}' retrieved successfully!`,
       data,
