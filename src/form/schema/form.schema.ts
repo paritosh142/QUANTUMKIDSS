@@ -6,10 +6,10 @@ export class Form extends Document {
   @Prop({ required: true, unique: true })
   uuid: string; 
 
-  @Prop({ required: true })
+  @Prop({ required: true,unique: true  })
   firstName: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true  ,unique: true})
   lastName: string;
 
   @Prop({ required: true, unique: true, match: /^\S+@\S+\.\S+$/ })
