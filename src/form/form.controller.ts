@@ -35,7 +35,7 @@ export class FormController {
     };
   }
   @Get('status')
-  @ApiOperation({ summary: 'Get form submissions by status' })
+  // @ApiOperation({ summary: 'Get form submissions by status' })
   @ApiResponse({ status: 200, description: 'Form submissions with the specified status retrieved successfully!' })
   async getFormsByStatus(@Query('status') status: string) {
     const { data, totalCount } = await this.formService.getSubmissionsByStatus(status);
@@ -46,7 +46,7 @@ export class FormController {
     };
   }
   @Patch('/updateStatus')
-  @ApiOperation({ summary: 'Update the status of a form' })
+  // @ApiOperation({ summary: 'Update the status of a form' })
   @ApiResponse({ status: 200, description: 'The status has been successfully updated.', type: Form })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   async updateStatus(@Query() updateFormStatusDto: UpdateFormStatusDto): Promise<Form> {
