@@ -28,17 +28,37 @@ export class FormController {
   }
 
   @Get()
-  async getAllForms() {
+  @ApiOperation({ summary: 'Grt all Data' })
+  @ApiResponse({ status: 200, description: 'Form Data retrieved successfully!' })
+  async getAllForms(
+    @Query('offset') offset: number,
+    @Query('pageSize') pageSize: number
+  ) {
     return {
       message: 'Form submissions retrieved successfully!',
-      data: await this.formService.getSubmissions(),
+      data: await this.formService.getSubmissions(offset, pageSize),
     };
   }
+  // @Get('status')
+  // // @ApiOperation({ summary: 'Get form submissions by status' })
+  // @ApiResponse({ status: 200, description: 'Form submissions with the specified status retrieved successfully!' })
+  // async getFormsByStatus(@Query('status') status: string) {
+  //   const { data, totalCount } = await this.formService.getSubmissionsByStatus(status);
+  //   return {
+  //     message: `Form submissions with status '${status}' retrieved successfully!`,
+  //     data,
+  //     totalCount,
+  //   };
+  // }
   @Get('status')
-  // @ApiOperation({ summary: 'Get form submissions by status' })
+  @ApiOperation({ summary: 'Get form submissions by status' })
   @ApiResponse({ status: 200, description: 'Form submissions with the specified status retrieved successfully!' })
-  async getFormsByStatus(@Query('status') status: string) {
-    const { data, totalCount } = await this.formService.getSubmissionsByStatus(status);
+  async getFormsByStatus(
+    @Query('status') status: string,
+    @Query('offset') offset: number,
+    @Query('pageSize') pageSize: number
+  ) {
+    const { data, totalCount } = await this.formService.getSubmissionsByStatus(status, offset, pageSize);
     return {
       message: `Form submissions with status '${status}' retrieved successfully!`,
       data,

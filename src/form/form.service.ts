@@ -30,10 +30,13 @@ export class FormService {
     }
   }
 
-  async getSubmissions(): Promise<SubmissionsResult> {
+  async getSubmissions(offset:number , pageSize:number): Promise<SubmissionsResult> {
     // return this.formModel.find().exec();
-    const data = await this.formModel.find().exec();  
-    const totalCount = await this.formModel.countDocuments();  
+    const data = await this.formModel.find()
+    .skip(offset)
+    .limit(pageSize)
+    .exec();  
+    const totalCount = await this.formModel.countDocuments().exec();  
   
     return {
       data,
@@ -45,8 +48,19 @@ export class FormService {
     const { uuid, status } = updateFormStatusDto;
     return this.formModel.findOneAndUpdate({ uuid }, { status }, { new: true }).exec();
   }
-  async getSubmissionsByStatus(status: string): Promise<{ data: Form[], totalCount: number }> {
-    const data = await this.formModel.find({ status }).exec();
+  // async getSubmissionsByStatus(status: string): Promise<{ data: Form[], totalCount: number }> {
+  //   const data = await this.formModel.find({ status }).exec();
+  //   const totalCount = await this.formModel.countDocuments({ status }).exec();
+  //   return {
+  //     data,
+  //     totalCount,
+  //   };
+  // }
+  async getSubmissionsByStatus(status: string, offset: number, pageSize: number): Promise<{ data: Form[], totalCount: number }> {
+    const data = await this.formModel.find({ status })
+      .skip(offset)
+      .limit(pageSize)
+      .exec();
     const totalCount = await this.formModel.countDocuments({ status }).exec();
     return {
       data,
