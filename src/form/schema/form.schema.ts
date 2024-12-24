@@ -4,7 +4,7 @@ import { Document } from 'mongoose';
 @Schema()
 export class Form extends Document {
   @Prop({ required: true, unique: true })
-  uuid: string; // Unique identifier for each form submission
+  uuid: string; 
 
   @Prop({ required: true })
   firstName: string;
@@ -26,6 +26,13 @@ export class Form extends Document {
 
   @Prop({ default: Date.now })
   submittedAt: Date;
+
+  @Prop({
+    enum: ['raw', 'interested', 'converted', 'not_interested'],
+    default: 'raw', 
+  })
+  status: string;
+  
 }
 
 export const FormSchema = SchemaFactory.createForClass(Form);
