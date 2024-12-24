@@ -1,6 +1,9 @@
-import { Body, Controller, Get, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { FormService } from './form.service';
 import { CreateFormDto } from './dto/create-form.dto';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { UpdateFormStatusDto } from './dto/update-status.dto';
+import { Form } from './schema/form.schema';
 
 @Controller('form')
 export class FormController {
@@ -13,7 +16,7 @@ export class FormController {
       const result = await this.formService.saveForm(createFormDto);
       return {
         message: 'Form submitted successfully!',
-        uuid: result.uuid, // Return the UUID here
+        uuid: result.uuid,
         data: result,
       };
     } catch (error) {
@@ -31,4 +34,23 @@ export class FormController {
       data: await this.formService.getSubmissions(),
     };
   }
+  @Get('status')
+  @ApiOperation({ summary: 'Get form submissions by status' })
+  @ApiResponse({ status: 200, description: 'Form submissions with the specified status retrieved successfully!' })
+  async getFormsByStatus(@Query('status') status: string) {
+    const { data, totalCount } = await this.formService.getSubmissionsByStatus(status);
+    return {
+      message: `Form submissions with status '${status}' retrieved successfully!`,
+      data,
+      totalCount,
+    };
+  }
+  @Patch('/updateStatus')
+  @ApiOperation({ summary: 'Update the status of a form' })
+  @ApiResponse({ status: 200, description: 'The status has been successfully updated.', type: Form })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  async updateStatus(@Query() updateFormStatusDto: UpdateFormStatusDto): Promise<Form> {
+    return this.formService.updateStatus(updateFormStatusDto);
+  }
+
 }

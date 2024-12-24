@@ -4,11 +4,11 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FormModule } from './form/form.module';
-import { LeadModule } from './Lead/lead.module';
+// import { LeadModule } from './Lead/lead.module';
 
 @Module({
   imports: [
-    LeadModule,
+    // LeadModule,
     ConfigModule.forRoot({
       isGlobal: true,
 
