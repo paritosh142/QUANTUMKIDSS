@@ -14,7 +14,9 @@ export interface SubmissionsResult {
 @Injectable()
 export class FormService {
   constructor(@InjectModel(Form.name) private formModel: Model<Form>,
-) {}
+) {
+  console.log("Your form name : " , Form.name);
+}
 
   async saveForm(createFormDto: CreateFormDto): Promise<Form> {
     try {
