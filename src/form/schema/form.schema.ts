@@ -5,7 +5,7 @@ import { Document } from 'mongoose';
 export class Form extends Document {
   @Prop({ required: true, unique: true })
   uuid: string; 
-
+  
   @Prop({ required: true,unique: true  })
   firstName: string;
 
@@ -18,7 +18,7 @@ export class Form extends Document {
   @Prop({ required: true })
   address: string;
 
-  @Prop({ required: true, match: /^\+?[1-9]\d{1,14}$/ })
+  @Prop({ required: true,unique: true, match: /^\+?[1-9]\d{1,14}$/ })
   mobileNumber: string;
 
   @Prop({ required: true, enum: ['Admission', 'Fee', 'Curriculum/Program', 'Other'] })
@@ -26,7 +26,8 @@ export class Form extends Document {
 
   @Prop({ default: Date.now })
   submittedAt: Date;
-
+  @Prop({ required: true, unique: true })
+  customId: string;
   @Prop({
     enum: ['raw', 'interested', 'converted', 'not_interested'],
     default: 'raw', 

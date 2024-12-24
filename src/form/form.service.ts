@@ -17,12 +17,20 @@ export class FormService {
 ) {
   console.log("Your form name : " , Form.name);
 }
-
+private generateCustomId(): string {
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let result = 'QUA-';
+  for (let i = 0; i < 6; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
   async saveForm(createFormDto: CreateFormDto): Promise<Form> {
     try {
       const newForm = new this.formModel({
         ...createFormDto,
         uuid: uuidv4(), 
+        customId: this.generateCustomId(),
       });
       return newForm.save();
     } catch (error) {
@@ -30,12 +38,17 @@ export class FormService {
     }
   }
 
-  async getSubmissions(offset:number , pageSize:number): Promise<SubmissionsResult> {
+  async getSubmissions(offset:string , pageSize:string): Promise<SubmissionsResult> {
     // return this.formModel.find().exec();
-    const data = await this.formModel.find()
-    .skip(offset)
-    .limit(pageSize)
-    .exec();  
+    const data = await this.formModel.aggregate([
+      {
+        $skip: (parseInt(offset)-1),
+      },
+      {
+        $limit: parseInt(pageSize),
+      }
+    ]);
+    console.log(data);
     const totalCount = await this.formModel.countDocuments().exec();  
   
     return {
@@ -56,10 +69,10 @@ export class FormService {
   //     totalCount,
   //   };
   // }
-  async getSubmissionsByStatus(status: string, offset: number, pageSize: number): Promise<{ data: Form[], totalCount: number }> {
+  async getSubmissionsByStatus(status: string ,offset :string , pageSize :string): Promise<{ data: Form[], totalCount: number }> {
     const data = await this.formModel.find({ status })
-      .skip(offset)
-      .limit(pageSize)
+      .skip((parseInt(offset)-1))
+      .limit(parseInt(pageSize))
       .exec();
     const totalCount = await this.formModel.countDocuments({ status }).exec();
     return {
