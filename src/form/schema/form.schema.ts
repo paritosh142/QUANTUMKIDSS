@@ -29,7 +29,7 @@ export class Form extends Document {
   @Prop({ required: true, unique: true })
   customId: string;
   @Prop({
-    enum: ['raw', 'interested', 'converted', 'not_interested'],
+    enum: ['raw', 'interested','FollowUp', ' visitScheduled','converted', 'notInterested'],
     default: 'raw', 
   })
   status: string;
