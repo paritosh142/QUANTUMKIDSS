@@ -7,6 +7,7 @@ enum StatusEnum {
   Converted = 'converted',
   Pending = 'pending',
   NotInterested = 'notInterested',
+  FollowUp = 'followUp'
 }
 
 export class UpdateFormStatusDto {
