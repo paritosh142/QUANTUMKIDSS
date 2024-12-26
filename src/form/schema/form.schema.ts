@@ -6,10 +6,10 @@ export class Form extends Document {
   @Prop({ required: true, unique: true })
   uuid: string; 
   
-  @Prop({ required: true,unique: true  })
+  @Prop({ required: true })
   firstName: string;
 
-  @Prop({ required: true  ,unique: true})
+  @Prop({ required: true  })
   lastName: string;
 
   @Prop({ required: true, unique: true, match: /^\S+@\S+\.\S+$/ })
@@ -27,7 +27,7 @@ export class Form extends Document {
   @Prop({ default: Date.now })
   submittedAt: Date;
   @Prop({ required: true, unique: true })
-  customId: string;
+  customId: string; 
   @Prop({
     enum: ['raw', 'interested','FollowUp', ' visitScheduled','converted', 'notInterested'],
     default: 'raw', 
