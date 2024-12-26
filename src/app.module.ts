@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { FormModule } from './form/form.module';
 // import { LeadModule } from './Lead/lead.module';
 import { AdminModule } from './admin/admin.module';
+import { BlogModule } from './blog/blog.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AdminModule } from './admin/admin.module';
     MongooseModule.forRoot('mongodb+srv://paritosh142:Password@data.iv962.mongodb.net/?retryWrites=true&w=majority&appName=Data'),
     FormModule,
     AdminModule,
+    BlogModule,
   ],
   controllers: [AppController],
   providers: [AppService],
