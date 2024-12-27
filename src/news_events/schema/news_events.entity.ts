@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('blogs')
-export class Blog {
+@Entity('news_events')
+export class NewsEvent {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -9,13 +9,13 @@ export class Blog {
   title: string;
 
   @Column({ type: 'text' })
-  content: string;
-
-  @Column({ type: 'simple-array' })
-  tags: string[];
+  description: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   imageUrl?: string;
+
+  @Column({ type: 'datetime', nullable: true })
+  eventDate?: Date;
 
   @CreateDateColumn()
   createdAt: Date;

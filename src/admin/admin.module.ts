@@ -1,11 +1,18 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
-import { Admin, AdminSchema } from './schema/admin.schema';
+import { Admin } from './schema/admin.schema';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Admin.name, schema: AdminSchema }])],
+  imports: [
+    TypeOrmModule.forFeature([Admin]),
+    JwtModule.register({
+      secret: 'xyxx', // Replace with your secret key
+      signOptions: { expiresIn: '1h' },
+    }),
+  ],
   controllers: [AdminController],
   providers: [AdminService],
 })

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsUUID } from 'class-validator';
 
 enum StatusEnum {
   Raw = 'raw',
@@ -7,21 +7,16 @@ enum StatusEnum {
   Converted = 'converted',
   Pending = 'pending',
   NotInterested = 'notInterested',
-  FollowUp = 'followUp'
+  FollowUp = 'followUp',
 }
 
 export class UpdateFormStatusDto {
-  @ApiProperty({
-    description: 'Unique identifier for the form',
-  })
+  @ApiProperty({ description: 'Unique identifier for the form' })
   @IsUUID()
   @IsNotEmpty()
   uuid: string;
 
-  @ApiProperty({
-    description: 'New status of the form',
-    enum: StatusEnum,
-  })
+  @ApiProperty({ description: 'New status of the form', enum: StatusEnum })
   @IsEnum(StatusEnum)
   @IsNotEmpty()
   status: StatusEnum;

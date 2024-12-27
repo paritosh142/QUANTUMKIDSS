@@ -13,12 +13,12 @@ export class BlogController {
 
   @Patch(':id')
   async updateBlog(@Param('id') id: string, @Body() updateDto: UpdateBlogDto) {
-    return this.blogService.updateBlog(id, updateDto);
+    return this.blogService.updateBlog(Number(id), updateDto);
   }
 
   @Delete(':id')
   async deleteBlog(@Param('id') id: string) {
-    return this.blogService.deleteBlog(id);
+    return this.blogService.deleteBlog(Number(id));
   }
 
   @Get()
@@ -28,6 +28,6 @@ export class BlogController {
 
   @Get(':id')
   async getBlogById(@Param('id') id: string) {
-    return this.blogService.getBlogById(id);
+    return this.blogService.getBlogById(Number(id));
   }
 }

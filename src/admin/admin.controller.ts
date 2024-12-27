@@ -8,7 +8,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UpdateUsernameDto } from './dto/update-username.dto';
 import { UpdateEmailDto } from './dto/update-email.dto';
 
-@ApiTags('Admin') // Groups these endpoints under "Admin" in Swagger
+@ApiTags('Admin') 
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
