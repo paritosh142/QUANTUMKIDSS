@@ -1,35 +1,49 @@
-import { Injectable, ConflictException, UnauthorizedException , NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  UnauthorizedException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, MoreThan as TypeOrmMoreThan } from 'typeorm';
 import * as crypto from 'crypto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { Admin, AdminDocument } from './schema/admin.schema';
+import { Admin } from './schema/admin.schema';
 import { AdminRegisterDto } from './dto/admin-register.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UpdateUsernameDto } from './dto/update-username.dto';
 import { UpdateEmailDto } from './dto/update-email.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AdminService {
-  constructor(@InjectModel(Admin.name) private adminModel: Model<AdminDocument>) {}
+  constructor(
+    @InjectRepository(Admin)
+    private adminRepository: Repository<Admin>,
+    private jwtService: JwtService,
+  ) {}
 
   async register(adminRegisterDto: AdminRegisterDto) {
     const { username, password, email } = adminRegisterDto;
 
-    // Check if username or email already exists
-    const existingAdmin = await this.adminModel.findOne({ $or: [{ username }, { email }] });
+    const existingAdmin = await this.adminRepository.findOne({
+      where: [{ username }, { email }],
+    });
     if (existingAdmin) {
       throw new ConflictException('Username or email already exists');
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create and save the new admin
-    const newAdmin = new this.adminModel({ username, password: hashedPassword, email });
-    await newAdmin.save();
+    const newAdmin = this.adminRepository.create({
+      username,
+      password: hashedPassword,
+      email,
+    });
+    await this.adminRepository.save(newAdmin);
 
     return { message: 'Admin registered successfully' };
   }
@@ -37,39 +51,37 @@ export class AdminService {
   async login(adminLoginDto: AdminLoginDto) {
     const { username, password } = adminLoginDto;
 
-    // Find the admin by username
-    const admin = await this.adminModel.findOne({ username });
+    const admin = await this.adminRepository.findOne({ where: { username } });
     if (!admin) {
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    // Verify the password
     const isPasswordValid = await bcrypt.compare(password, admin.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    return { message: 'Admin logged in successfully' };
+    const payload = { username: admin.username, sub: admin.id };
+    const token = this.jwtService.sign(payload);
+
+    return { message: 'Admin logged in successfully', token };
   }
+
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
     const { email } = forgotPasswordDto;
 
-    // Find admin by email
-    const admin = await this.adminModel.findOne({ email });
+    const admin = await this.adminRepository.findOne({ where: { email } });
     if (!admin) {
       throw new NotFoundException('Email not found');
     }
 
-    // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpiration = new Date(Date.now() + 3600000); // 1 hour
+    const resetTokenExpiration = new Date(Date.now() + 3600000);
 
     admin.resetToken = resetToken;
     admin.resetTokenExpiration = resetTokenExpiration;
-    await admin.save();
+    await this.adminRepository.save(admin);
 
-    // Send reset token via email (pseudo-code)
-    // Replace this with actual email sending logic
     console.log(`Reset token (send this via email): ${resetToken}`);
 
     return { message: 'Password reset link sent to your email' };
@@ -78,22 +90,19 @@ export class AdminService {
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { token, newPassword } = resetPasswordDto;
 
-    // Find admin by reset token
-    const admin = await this.adminModel.findOne({
-      resetToken: token,
-      resetTokenExpiration: { $gt: new Date() },
+    const admin = await this.adminRepository.findOne({
+      where: { resetToken: token, resetTokenExpiration: TypeOrmMoreThan(new Date()) },
     });
 
     if (!admin) {
       throw new BadRequestException('Invalid or expired reset token');
     }
 
-    // Hash the new password and update admin
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     admin.password = hashedPassword;
-    admin.resetToken = undefined;
-    admin.resetTokenExpiration = undefined;
-    await admin.save();
+    admin.resetToken = null;
+    admin.resetTokenExpiration = null;
+    await this.adminRepository.save(admin);
 
     return { message: 'Password reset successfully' };
   }
@@ -101,21 +110,22 @@ export class AdminService {
   async updateUsername(updateUsernameDto: UpdateUsernameDto) {
     const { currentUsername, newUsername } = updateUsernameDto;
 
-    // Check if the current username exists
-    const admin = await this.adminModel.findOne({ username: currentUsername });
+    const admin = await this.adminRepository.findOne({
+      where: { username: currentUsername },
+    });
     if (!admin) {
       throw new NotFoundException('Admin with the current username not found');
     }
 
-    // Check if the new username is already taken
-    const usernameExists = await this.adminModel.findOne({ username: newUsername });
+    const usernameExists = await this.adminRepository.findOne({
+      where: { username: newUsername },
+    });
     if (usernameExists) {
       throw new ConflictException('The new username is already taken');
     }
 
-    // Update the username
     admin.username = newUsername;
-    await admin.save();
+    await this.adminRepository.save(admin);
 
     return { message: 'Username updated successfully' };
   }
@@ -123,21 +133,22 @@ export class AdminService {
   async updateEmail(updateEmailDto: UpdateEmailDto) {
     const { currentEmail, newEmail } = updateEmailDto;
 
-    // Check if the current email exists
-    const admin = await this.adminModel.findOne({ email: currentEmail });
+    const admin = await this.adminRepository.findOne({
+      where: { email: currentEmail },
+    });
     if (!admin) {
       throw new NotFoundException('Admin with the current email not found');
     }
 
-    // Check if the new email is already taken
-    const emailExists = await this.adminModel.findOne({ email: newEmail });
+    const emailExists = await this.adminRepository.findOne({
+      where: { email: newEmail },
+    });
     if (emailExists) {
       throw new ConflictException('The new email is already taken');
     }
 
-    // Update the email
     admin.email = newEmail;
-    await admin.save();
+    await this.adminRepository.save(admin);
 
     return { message: 'Email updated successfully' };
   }

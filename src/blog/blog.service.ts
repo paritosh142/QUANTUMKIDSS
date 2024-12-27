@@ -1,34 +1,38 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Blog } from './schema/blog.schema';
 import { CreateBlogDto, UpdateBlogDto } from './dto/blog.dto';
 
 @Injectable()
 export class BlogService {
-  constructor(@InjectModel(Blog.name) private blogModel: Model<Blog>) {}
+  constructor(
+    @InjectRepository(Blog)
+    private readonly blogRepository: Repository<Blog>,
+  ) {}
 
   async createBlog(blogDto: CreateBlogDto): Promise<Blog> {
-    return await this.blogModel.create(blogDto);
+    const blog = this.blogRepository.create(blogDto);
+    return await this.blogRepository.save(blog);
   }
 
-  async updateBlog(id: string, updateDto: UpdateBlogDto): Promise<Blog> {
-    const blog = await this.blogModel.findByIdAndUpdate(id, updateDto, { new: true });
+  async updateBlog(id: number, updateDto: UpdateBlogDto): Promise<Blog> {
+    const blog = await this.blogRepository.preload({ id, ...updateDto });
     if (!blog) throw new NotFoundException('Blog not found');
-    return blog;
+    return await this.blogRepository.save(blog);
   }
 
-  async deleteBlog(id: string): Promise<void> {
-    const result = await this.blogModel.findByIdAndDelete(id);
-    if (!result) throw new NotFoundException('Blog not found');
+  async deleteBlog(id: number): Promise<void> {
+    const result = await this.blogRepository.delete(id);
+    if (result.affected === 0) throw new NotFoundException('Blog not found');
   }
 
   async getAllBlogs(): Promise<Blog[]> {
-    return await this.blogModel.find().sort({ createdAt: -1 });
+    return await this.blogRepository.find({ order: { createdAt: 'DESC' } });
   }
 
-  async getBlogById(id: string): Promise<Blog> {
-    const blog = await this.blogModel.findById(id);
+  async getBlogById(id: number): Promise<Blog> {
+    const blog = await this.blogRepository.findOne({ where: { id } });
     if (!blog) throw new NotFoundException('Blog not found');
     return blog;
   }
