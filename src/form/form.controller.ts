@@ -74,4 +74,21 @@ export class FormController {
     return this.formService.updateStatus(updateFormStatusDto);
   }
 
+  @Get('count')
+  @ApiResponse({ status: 200, description: 'Count of leads retrieved successfully!' })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  async getCount(@Query('status') status: string) {
+    try {
+      const count = await this.formService.getCount(status);
+      return {
+        message: 'Count of leads retrieved successfully!',
+        count,
+      };
+    } catch (error) {
+      return {
+        message: 'Failed to retrieve count of leads',
+        error: error.message,
+      };
+    }
+  }
 }

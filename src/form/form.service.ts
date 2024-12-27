@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Form } from './schema/form.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 import { CreateFormDto } from './dto/create-form.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateFormStatusDto } from './dto/update-status.dto';
-// import { getRepositoryToken } from '@nestjs/typeorm';
+import { Form } from './schema/form.schema';
+
 export interface SubmissionsResult {
   data: Form[];
   totalCount: number;
@@ -13,74 +14,71 @@ export interface SubmissionsResult {
 
 @Injectable()
 export class FormService {
-  constructor(@InjectModel(Form.name) private formModel: Model<Form>,
-) {
-  console.log("Your form name : " , Form.name);
-}
-private generateCustomId(): string {
-  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let result = 'QUA-';
-  for (let i = 0; i < 6; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  constructor(
+    @InjectRepository(Form)
+    private formRepository: Repository<Form>,
+  ) {
+    console.log("Your form name : ", Form.name);
   }
-  return result;
-}
+
+  private generateCustomId(): string {
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = 'QUA-';
+    for (let i = 0; i < 6; i++) {
+      result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+  }
+
   async saveForm(createFormDto: CreateFormDto): Promise<Form> {
     try {
-      const newForm = new this.formModel({
+      const newForm = this.formRepository.create({
         ...createFormDto,
-        uuid: uuidv4(), 
+        uuid: uuidv4(),
         customId: this.generateCustomId(),
       });
-      return newForm.save();
+      return this.formRepository.save(newForm);
     } catch (error) {
       throw new Error(`Failed to save form: ${error.message}`);
     }
   }
 
-  async getSubmissions(offset:string , pageSize:string): Promise<SubmissionsResult> {
-    // return this.formModel.find().exec();
-    const data = await this.formModel.aggregate([
-      {
-        $skip: (parseInt(offset)-1),
-      },
-      {
-        $limit: parseInt(pageSize),
-      }
-    ]);
-    console.log(data);
-    const totalCount = await this.formModel.countDocuments().exec();  
-  
+  async getSubmissions(offset: string, pageSize: string): Promise<SubmissionsResult> {
+    const skip = (parseInt(offset) - 1) * parseInt(pageSize);
+    const [data, totalCount] = await this.formRepository.findAndCount({
+      skip,
+      take: parseInt(pageSize),
+    });
     return {
       data,
       totalCount,
     };
   }
- 
+
   async updateStatus(updateFormStatusDto: UpdateFormStatusDto): Promise<Form> {
     const { uuid, status } = updateFormStatusDto;
-    return this.formModel.findOneAndUpdate({ uuid }, { status }, { new: true }).exec();
+    const form = await this.formRepository.findOneBy({ uuid });
+    if (!form) {
+      throw new BadRequestException('Form not found');
+    }
+    form.status = status;
+    return this.formRepository.save(form);
   }
-  // async getSubmissionsByStatus(status: string): Promise<{ data: Form[], totalCount: number }> {
-  //   const data = await this.formModel.find({ status }).exec();
-  //   const totalCount = await this.formModel.countDocuments({ status }).exec();
-  //   return {
-  //     data,
-  //     totalCount,
-  //   };
-  // }
-  async getSubmissionsByStatus(status: string ,offset :string , pageSize :string): Promise<{ data: Form[], totalCount: number }> {
-    const data = await this.formModel.find({ status })
-      .skip((parseInt(offset)-1))
-      .limit(parseInt(pageSize))
-      .exec();
-    const totalCount = await this.formModel.countDocuments({ status }).exec();
+
+  async getSubmissionsByStatus(status: string, offset: string, pageSize: string): Promise<SubmissionsResult> {
+    const skip = (parseInt(offset) - 1) * parseInt(pageSize);
+    const [data, totalCount] = await this.formRepository.findAndCount({
+      where: { status },
+      skip,
+      take: parseInt(pageSize),
+    });
     return {
       data,
       totalCount,
     };
   }
+
+  async getCount(status: string): Promise<number> {
+    return this.formRepository.count({ where: { status } });
+  }
 }
-
-
-

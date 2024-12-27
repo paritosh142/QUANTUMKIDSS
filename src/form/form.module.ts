@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { FormController } from './form.controller';
 import { FormService } from './form.service';
-import { Form, FormSchema } from './schema/form.schema';
+import { Form } from './schema/form.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Form.name, schema: FormSchema }]),
+    TypeOrmModule.forFeature([Form]),
   ],
   controllers: [FormController],
   providers: [FormService],

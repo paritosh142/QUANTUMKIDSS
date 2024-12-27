@@ -1,39 +1,38 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
-@Schema()
-export class Form extends Document {
-  @Prop({ required: true, unique: true })
-  uuid: string; 
-  
-  @Prop({ required: true })
+@Entity()
+export class Form {
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: false })
   firstName: string;
 
-  @Prop({ required: true  })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   lastName: string;
 
-  @Prop({ required: true, unique: true, match: /^\S+@\S+\.\S+$/ })
+  @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
   email: string;
 
-  @Prop({ required: true })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   address: string;
 
-  @Prop({ required: true,unique: true, match: /^\+?[1-9]\d{1,14}$/ })
+  @Column({ type: 'varchar', length: 15, nullable: false, unique: true })
   mobileNumber: string;
 
-  @Prop({ required: true, enum: ['Admission', 'Fee', 'Curriculum/Program', 'Other'] })
+  @Column({ type: 'enum', enum: ['Admission', 'Fee', 'Curriculum/Program', 'Other'], nullable: false })
   category: string;
 
-  @Prop({ default: Date.now })
+  @CreateDateColumn()
   submittedAt: Date;
-  @Prop({ required: true, unique: true })
-  customId: string; 
-  @Prop({
-    enum: ['raw', 'interested','FollowUp', ' visitScheduled','converted', 'notInterested','followUp'],
-    default: 'raw', 
+
+  @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
+  customId: string;
+
+  @Column({
+    type: 'enum',
+    enum: ['raw', 'interested', 'FollowUp', 'visitScheduled', 'converted', 'notInterested'],
+    default: 'raw',
   })
   status: string;
-  
 }
-
-export const FormSchema = SchemaFactory.createForClass(Form);
