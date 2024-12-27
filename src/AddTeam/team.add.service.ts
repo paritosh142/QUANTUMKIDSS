@@ -1,64 +1,70 @@
-import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateMemberDto } from './dto/add.dto';
-import { AddTeam } from './schema/teamAdd.schema';
-import { Model, Types } from 'mongoose';
+
 import { UpdateTeamDto } from './dto/update.dto';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+import { AddTeam } from './schema/teamAdd.schema';
+
 export interface MemberResult {
-    data: AddTeam[];
-    totalCount: number;
+  data: AddTeam[];
+  totalCount: number;
 }
+
+@Injectable()
 export class TeamAddService {
-  constructor(@InjectModel(AddTeam.name) private memberModel: Model<AddTeam>) {}
+  constructor(
+    @InjectRepository(AddTeam)
+    private memberRepository: Repository<AddTeam>,
+  ) {}
 
   async addMember(createMemberDto: CreateMemberDto): Promise<AddTeam> {
     try {
-      const newMember = new this.memberModel({
+      const newMember = this.memberRepository.create({
         ...createMemberDto,
-        uuid: uuidv4(), 
+        uuid: uuidv4(),
       });
-      return newMember.save();
+      return this.memberRepository.save(newMember);
     } catch (error) {
       throw new Error(`Failed to add member: ${error.message}`);
     }
   }
-  async getMember(offset:string , pageSize:string): Promise<MemberResult > {
+
+  async getMember(offset: string, pageSize: string): Promise<MemberResult> {
     try {
-    const data = await this.memberModel.aggregate([
-        {
-            $skip: (parseInt(offset)-1),
-        },
-        {
-            $limit: parseInt(pageSize),
-        }
-    ])
-        const totalCount = await this.memberModel.countDocuments().exec();
-        return {
-            data,
-            totalCount
-        }
+      const skip = (parseInt(offset) - 1) * parseInt(pageSize);
+      const [data, totalCount] = await this.memberRepository.findAndCount({
+        skip,
+        take: parseInt(pageSize),
+      });
+      return {
+        data,
+        totalCount,
+      };
     } catch (error) {
       throw new Error(`Failed to fetch member: ${error.message}`);
     }
   }
+
   async updateMember(id: string, updateMemberDto: UpdateTeamDto): Promise<AddTeam> {
-    const existingMember = await this.memberModel.findByIdAndUpdate({id}, updateMemberDto, { new: true }).exec();
+    const existingMember = await this.memberRepository.findOne({ where: { memberId: id } });
 
     if (!existingMember) {
       throw new NotFoundException(`Member with ID ${id} not found`);
     }
 
-    return existingMember;
+    Object.assign(existingMember, updateMemberDto);
+    return this.memberRepository.save(existingMember);
   }
 
   async deleteMember(memberId: string): Promise<AddTeam> {
-    const existingMember = await this.memberModel.findOneAndDelete({ memberId }).exec();
+    const existingMember = await this.memberRepository.findOne({ where: { memberId } });
 
     if (!existingMember) {
-        throw new NotFoundException(`Member with UUID ${memberId} not found`);
+      throw new NotFoundException(`Member with UUID ${memberId} not found`);
     }
 
-    return existingMember;
+    return this.memberRepository.remove(existingMember);
   }
 }
