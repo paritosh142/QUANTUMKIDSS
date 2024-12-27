@@ -33,6 +33,16 @@ export class CreateMemberDto{
     @IsString()
     memberDesination: string;
 
+    @ApiProperty({description:"Designation of the member"})
+    @IsNotEmpty()
+    @IsString()
+    description: string;
+
+    @ApiProperty({description:"Designation of the member"})
+    @IsNotEmpty()
+    @IsString()
+    order: string;
+
     @ApiProperty({description:"Profile Picture of the member"})
     @IsNotEmpty()
     @IsString()

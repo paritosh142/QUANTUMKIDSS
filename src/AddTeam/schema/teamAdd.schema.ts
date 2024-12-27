@@ -55,5 +55,13 @@ export class AddTeam {
   memberDesination: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
+  description:string
+
+  @Column({ type: 'varchar', nullable: true })
   profilePic: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  order:string;
+
+
 }

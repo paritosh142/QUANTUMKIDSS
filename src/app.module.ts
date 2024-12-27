@@ -14,7 +14,7 @@ import { NewsEventModule } from './news_events/news_events.module';
 import { PictureGalleryModule } from './picture_gallery/picture_gallery.module';
 import { NewsEvent } from './news_events/schema/news_events.entity';
 import { Picture } from './picture_gallery/schema/picture_gallery.entity';
-
+import { Form } from './form/schema/form.schema';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,9 +25,9 @@ import { Picture } from './picture_gallery/schema/picture_gallery.entity';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'Password@0000',
+      password: 'gAuravnegi',
       database: 'quantum',
-      entities: [Admin,Blog,NewsEvent,Picture, __dirname + '/**/*.entity{.ts,.js}'],
+      entities: [Form,Admin,Blog,NewsEvent,Picture, __dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
     FormModule,
@@ -35,7 +35,7 @@ import { Picture } from './picture_gallery/schema/picture_gallery.entity';
     BlogModule,
     NewsEventModule,
     PictureGalleryModule,
-    // TeamAddModule
+    TeamAddModule
   ],
   controllers: [AppController],
   providers: [AppService],
