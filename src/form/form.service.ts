@@ -22,8 +22,8 @@ export class FormService {
   }
 
   private generateCustomId(): string {
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let result = 'QUA-';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = 'QK-';
     for (let i = 0; i < 6; i++) {
       result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
