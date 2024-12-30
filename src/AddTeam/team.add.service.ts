@@ -2,7 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateMemberDto } from './dto/add.dto';
-
+import * as fs from 'fs';
+import * as path from 'path';
 import { UpdateTeamDto } from './dto/update.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { AddTeam } from './schema/teamAdd.schema';
@@ -46,7 +47,9 @@ export class TeamAddService {
       throw new Error(`Failed to fetch member: ${error.message}`);
     }
   }
-
+  async getAllMembers(): Promise<AddTeam[]> {
+    return await this.memberRepository.find();
+  }
   async updateMember(id: string, updateMemberDto: UpdateTeamDto): Promise<AddTeam> {
     const existingMember = await this.memberRepository.findOne({ where: { memberId: id } });
 
@@ -58,13 +61,38 @@ export class TeamAddService {
     return this.memberRepository.save(existingMember);
   }
 
-  async deleteMember(memberId: string): Promise<AddTeam> {
-    const existingMember = await this.memberRepository.findOne({ where: { memberId } });
+  // async deleteMember(memberId: string): Promise<AddTeam> {
+  //   const existingMember = await this.memberRepository.findOne({ where: { memberId } });
 
-    if (!existingMember) {
-      throw new NotFoundException(`Member with UUID ${memberId} not found`);
+  //   if (!existingMember) {
+  //     throw new NotFoundException(`Member with UUID ${memberId} not found`);
+  //   }
+
+  //   return this.memberRepository.remove(existingMember);
+  // }
+  async findMemberId(id: string): Promise<AddTeam> {
+    const member = await this.memberRepository.findOne({where:{memberId:id}});
+    if (!member) {
+      throw new NotFoundException(`Member with ID ${id} not found`);
+    }
+    return member;
+  }
+  async deleteMember(memberId: string): Promise<AddTeam> {
+    const member = await this.memberRepository.findOne({where:{memberId}});
+    if (!member) {
+      throw new NotFoundException(`Member with ID ${memberId} not found`);
     }
 
-    return this.memberRepository.remove(existingMember);
+    if (member.profilePic) {
+      const filePath = path.join(__dirname, '..', '..', 'uploads', member.profilePic);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(`Failed to delete file: ${filePath}`, err);
+        }
+      });
+    }
+
+    await this.memberRepository.remove(member);
+    return member;
   }
 }

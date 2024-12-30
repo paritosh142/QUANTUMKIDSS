@@ -1,8 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString ,IsOptional } from "class-validator";
 
 
 export class CreateMemberDto{
+
+    uuid?: string;
     @ApiProperty({description:"Name of the member"})
     @IsString()
     @IsNotEmpty()
@@ -44,7 +46,7 @@ export class CreateMemberDto{
     order: string;
 
     @ApiProperty({description:"Profile Picture of the member"})
-    @IsNotEmpty()
     @IsString()
-    profilePic: string;
+    @IsOptional()
+    profilePic?: string;
 }
