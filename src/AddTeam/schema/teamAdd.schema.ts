@@ -48,13 +48,13 @@ export class AddTeam {
   @Column({ type: 'varchar', length: 15, nullable: true, unique: true })
   memberMobile: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true , unique: true})
   memberId: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   memberDesination: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'text', nullable: true })
   description:string
 
   @Column({ type: 'varchar', nullable: true })
