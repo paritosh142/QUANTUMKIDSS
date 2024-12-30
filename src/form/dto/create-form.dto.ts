@@ -37,9 +37,10 @@ export class CreateFormDto {
 
   @ApiProperty({
     description: 'Current status or type of the lead',
-    enum: ['raw', 'interested', 'converted', 'pending', 'notInterested', 'followUp'],
+    enum: ['raw', 'interested', 'converted', 'pending', 'notInterested', "visitScheduled" ,],
     default: 'raw',
   })
-  @IsEnum(['raw', 'interested', 'converted', 'pending', 'notInterested', 'followUp'])
+  @IsEnum(['raw', 'interested', 'converted', 'pending', 'notInterested', "visitScheduled" ,"formFilled",
+      "admitted"])
   type: string = 'raw';
 }

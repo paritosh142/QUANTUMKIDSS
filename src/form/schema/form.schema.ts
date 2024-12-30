@@ -31,7 +31,7 @@ export class Form {
 
   @Column({
     type: 'enum',
-    enum: ['raw', 'interested', 'FollowUp', 'visitScheduled', 'converted', 'notInterested'],
+    enum: ['raw', 'interested', 'FollowUp', 'visitScheduled', 'converted', 'notInterested',"formFilled","admitted"],
     default: 'raw',
   })
   status: string;

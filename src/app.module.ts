@@ -16,6 +16,7 @@ import { NewsEvent } from './news_events/schema/news_events.entity';
 import { Picture } from './picture_gallery/schema/picture_gallery.entity';
 import { Form } from './form/schema/form.schema';
 import { AddTeam } from './AddTeam/schema/teamAdd.schema';
+import StudentForm from './form/schema/inqueryschema';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -28,7 +29,7 @@ import { AddTeam } from './AddTeam/schema/teamAdd.schema';
       username: 'root',
       password: 'gAuravnegi',
       database: 'quantum',
-      entities: [Form,AddTeam,Admin,Blog,NewsEvent,Picture, __dirname + '/**/*.entity{.ts,.js}'],
+      entities: [Form,StudentForm,AddTeam,Admin,Blog,NewsEvent,Picture, __dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
     FormModule,

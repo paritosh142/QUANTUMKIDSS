@@ -6,17 +6,24 @@ import { CreateFormDto } from './dto/create-form.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateFormStatusDto } from './dto/update-status.dto';
 import { Form } from './schema/form.schema';
+import StudentForm from './schema/inqueryschema';
+import { EnqueryFormDto } from './dto/inquery-form.dto';
 
 export interface SubmissionsResult {
   data: Form[];
   totalCount: number;
 }
-
+export interface InqueryResult {
+  data: StudentForm[];
+  totalCount: number;
+}
 @Injectable()
 export class FormService {
   constructor(
     @InjectRepository(Form)
     private formRepository: Repository<Form>,
+    @InjectRepository(StudentForm)
+    private studentFormRepository: Repository<StudentForm>,
   ) {
     console.log("Your form name : ", Form.name);
   }
@@ -44,11 +51,8 @@ export class FormService {
   }
 
   async getSubmissions(offset: string, pageSize: string): Promise<SubmissionsResult> {
-    const skip = (parseInt(offset) - 1) * parseInt(pageSize);
-    const [data, totalCount] = await this.formRepository.findAndCount({
-      skip,
-      take: parseInt(pageSize),
-    });
+    // const skip = (parseInt(offset) - 1) * parseInt(pageSize);
+    const [data, totalCount] = await this.formRepository.findAndCount();
     return {
       data,
       totalCount,
@@ -66,11 +70,9 @@ export class FormService {
   }
 
   async getSubmissionsByStatus(status: string, offset: string, pageSize: string): Promise<SubmissionsResult> {
-    const skip = (parseInt(offset) - 1) * parseInt(pageSize);
+    // const skip = (parseInt(offset) - 1) * parseInt(pageSize);
     const [data, totalCount] = await this.formRepository.findAndCount({
       where: { status },
-      skip,
-      take: parseInt(pageSize),
     });
     return {
       data,
@@ -81,4 +83,27 @@ export class FormService {
   async getCount(status: string): Promise<number> {
     return this.formRepository.count({ where: { status } });
   }
+  async saveInqueryForm(enqueryFormDto: EnqueryFormDto): Promise<StudentForm> {
+    try {
+      const newForm = this.studentFormRepository.create({
+        ...enqueryFormDto,
+        uuid: uuidv4(),
+        // formEnqueryId: this.generateEnqueryId(),
+      });
+      return this.studentFormRepository.save(newForm);
+    } catch (error) {
+      throw new Error(`Failed to save form: ${error.message}`);
+    }
+  }
+
+  async getInqueryForm(): Promise<InqueryResult> {
+    // const skip = (parseInt(offset) - 1) * parseInt(pageSize);
+    const [data, totalCount] = await this.studentFormRepository.findAndCount();
+    return {
+      data,
+      totalCount,
+    };
+  }
+
+
 }

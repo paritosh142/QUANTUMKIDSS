@@ -4,6 +4,7 @@ import { CreateFormDto } from './dto/create-form.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UpdateFormStatusDto } from './dto/update-status.dto';
 import { Form } from './schema/form.schema';
+import { EnqueryFormDto } from './dto/inquery-form.dto';
 
 @Controller('form')
 export class FormController {
@@ -90,5 +91,35 @@ export class FormController {
         error: error.message,
       };
     }
+  }
+  @Post('enqueryForm')
+  @UsePipes(new ValidationPipe())
+  @ApiOperation({ summary: 'Get all Data' })
+  @ApiResponse({ status: 200, description: 'EnqueryForm Data Created successfully!' })
+  @ApiResponse({ status: 500, description: 'Error in Submitting form!' })
+  async submitInquiryForm(@Body() enqueryFormDto: EnqueryFormDto) {
+    try{
+      const result  = await this.formService.saveInqueryForm(enqueryFormDto);
+      return {
+        message: 'Form submitted successfully!',
+        uuid: result.uuid,
+        data: result,
+      };
+    }
+    catch(error){
+      return {
+        message: 'Failed to submit form',
+        error: error.message,
+      };
+    }
+  }
+  @Get('enqueryForm/get')
+  @ApiOperation({ summary: 'Get all Data' })
+  @ApiResponse({ status: 200, description: 'EnqueryForm Data retrieved successfully!' })
+  async getAllInquiryForms() {
+    return {
+      message: 'Form submissions retrieved successfully!',
+      data: await this.formService.getInqueryForm(),
+    };
   }
 }
