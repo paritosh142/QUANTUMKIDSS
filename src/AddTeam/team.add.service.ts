@@ -48,7 +48,12 @@ export class TeamAddService {
     }
   }
   async getAllMembers(): Promise<AddTeam[]> {
-    return await this.memberRepository.find();
+    // return await this.memberRepository.find();
+    return await this.memberRepository.find({
+      order: {
+        createdAt: "DESC", 
+    },
+  });
   }
   async updateMember(id: string, updateMemberDto: UpdateTeamDto): Promise<AddTeam> {
     const existingMember = await this.memberRepository.findOne({ where: { memberId: id } });

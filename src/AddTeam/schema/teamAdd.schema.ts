@@ -29,7 +29,7 @@
 
 
 // export const AddTeamSchema = SchemaFactory.createForClass(AddTeam);
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
 @Entity()
 export class AddTeam {
@@ -63,5 +63,7 @@ export class AddTeam {
   @Column({ type: 'varchar', length: 255, nullable: true })
   order:string;
 
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
 
 }
