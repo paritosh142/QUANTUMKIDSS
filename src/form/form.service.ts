@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { createObjectCsvStringifier } from 'csv-writer';
 
 import { CreateFormDto } from './dto/create-form.dto';
 import { v4 as uuidv4 } from 'uuid';
@@ -59,7 +60,7 @@ export class FormService {
     }
   }
 
-  async getSubmissions(offset: string, pageSize: string): Promise<SubmissionsResult> {
+  async getSubmissions(): Promise<SubmissionsResult> {
     // const skip = (parseInt(offset) - 1) * parseInt(pageSize);
     const [data, totalCount] = await this.formRepository.findAndCount();
     return {
@@ -156,6 +157,45 @@ export class FormService {
     }
     Object.assign(fee, feeSubmissionDto);
     return this.feeRepository.save(fee);
+  }
+  async getFeeDetailsCsv(): Promise<string> {
+    const feeDetails = await this.getFeeDetails();
+
+    const csvStringifier = createObjectCsvStringifier({
+      header: [
+        { id: 'customId', title: 'Custom ID' },
+        { id: 'firstName', title: 'First Name' },
+        { id: 'lastName', title: 'Last Name' },
+        { id: 'email', title: 'Email' },
+        { id: 'mobileNumber', title: 'Mobile Number' },
+        { id: 'firstInstallment', title: 'First Installment' },
+        { id: 'secondInstallment', title: 'Second Installment' },
+        { id: 'thirdInstallment', title: 'Third Installment' },
+        
+      ],
+    });
+    const csvData = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(feeDetails.data);
+    return csvData;
+  }
+
+  async getLeadDetailsCsv(): Promise<string> {
+    const leadDetails = await this.getSubmissions();
+
+    const csvStringifier = createObjectCsvStringifier({
+      header: [
+        { id: 'customId', title: 'Custom ID' },
+        { id: 'firstName', title: 'First Name' },
+        { id: 'lastName', title: 'Last Name' },
+        { id: 'email', title: 'Email' },
+        { id: 'address', title: 'Address' },
+        { id: 'mobileNumber', title: 'Mobile Number' },
+        { id: 'category', title: 'Category' },
+        { id: 'submittedAt', title: 'submitted At' },
+        { id: 'status', title: 'Status' },
+      ],
+    });
+    const csvData = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(leadDetails.data);
+    return csvData;
   }
   
 }
