@@ -4,10 +4,11 @@ import { FormController } from './form.controller';
 import { FormService } from './form.service';
 import { Form } from './schema/form.schema';
 import StudentForm from './schema/inqueryschema';
+import FeeManagement from './schema/feeManagement';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Form, StudentForm]),
+    TypeOrmModule.forFeature([Form, StudentForm,FeeManagement]),
   ],
   controllers: [FormController],
   providers: [FormService],

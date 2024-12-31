@@ -8,6 +8,8 @@ import { UpdateFormStatusDto } from './dto/update-status.dto';
 import { Form } from './schema/form.schema';
 import StudentForm from './schema/inqueryschema';
 import { EnqueryFormDto } from './dto/inquery-form.dto';
+import FeeManagement from './schema/feeManagement';
+import { FeeSubmissionDto } from './dto/fee-submit.dto';
 
 export interface SubmissionsResult {
   data: Form[];
@@ -17,6 +19,11 @@ export interface InqueryResult {
   data: StudentForm[];
   totalCount: number;
 }
+
+export interface FeeSubmit {
+  data: FeeManagement[];
+  totalCount: number;
+}
 @Injectable()
 export class FormService {
   constructor(
@@ -24,6 +31,8 @@ export class FormService {
     private formRepository: Repository<Form>,
     @InjectRepository(StudentForm)
     private studentFormRepository: Repository<StudentForm>,
+    @InjectRepository(FeeManagement)
+    private feeRepository: Repository<FeeManagement>,
   ) {
     console.log("Your form name : ", Form.name);
   }
@@ -90,7 +99,12 @@ export class FormService {
         uuid: uuidv4(),
         // formEnqueryId: this.generateEnqueryId(),
       });
-      return this.studentFormRepository.save(newForm);
+      const saveIn  = this.feeRepository.create({
+        ...enqueryFormDto,
+        uuid: uuidv4(),
+      })
+      await this.feeRepository.save(saveIn);
+      return await this.studentFormRepository.save(newForm);
     } catch (error) {
       throw new Error(`Failed to save form: ${error.message}`);
     }
@@ -105,5 +119,43 @@ export class FormService {
     };
   }
 
+  async getInqueryFormBycustomId(customId:string): Promise<boolean> {
+   
+    const [,count] = await this.studentFormRepository.findAndCount({
+      where: { customId },
+    });
+    return count>0;
+  }
 
+  async saveFee(feeData: FeeSubmissionDto): Promise<FeeManagement> {
+    try {
+      const newFee = this.feeRepository.create({
+        ...feeData,
+        uuid: uuidv4(),
+      });
+      const savedFee = await this.feeRepository.save(newFee);
+      return savedFee;
+    } catch (error) {
+      throw new Error(`Failed to save fee: ${error.message}`);
+    }
+  }
+
+  async getFeeDetails(): Promise<FeeSubmit> {
+    const [data, totalCount] = await this.feeRepository.findAndCount();
+    return {
+      data,
+      totalCount,
+    };
+  }
+
+  async updateFeeData(uuid: string, feeSubmissionDto: FeeSubmissionDto): Promise<FeeManagement> {
+    const fee = await this.feeRepository.findOne({ where: { uuid } });
+    
+    if (!fee) {
+      throw new BadRequestException('Fee not found');
+    }
+    Object.assign(fee, feeSubmissionDto);
+    return this.feeRepository.save(fee);
+  }
+  
 }

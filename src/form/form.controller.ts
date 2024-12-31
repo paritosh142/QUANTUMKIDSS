@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { FormService } from './form.service';
 import { CreateFormDto } from './dto/create-form.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UpdateFormStatusDto } from './dto/update-status.dto';
 import { Form } from './schema/form.schema';
 import { EnqueryFormDto } from './dto/inquery-form.dto';
+import { FeeSubmissionDto } from './dto/fee-submit.dto';
 
 @Controller('form')
 export class FormController {
@@ -122,4 +123,55 @@ export class FormController {
       data: await this.formService.getInqueryForm(),
     };
   }
+
+
+  @Get('enqueryForm/find')
+  @ApiOperation({ summary: 'Get all Data' })
+  @ApiResponse({ status: 200, description: 'EnqueryForm Data retrieved successfully!' })
+  async getInquiryForm(@Query('customId') customId: string) {
+    return {
+      message: 'contact form retrieved successfully!',
+      data: await this.formService.getInqueryFormBycustomId(customId),
+    };
+  }
+
+
+  @Post('feeSubmit')
+  @ApiOperation({ summary: 'Set user Fee' })
+  @ApiResponse({ status: 200, description: 'Fee Submitted successfully!' })
+  @ApiResponse({ status: 500, description: 'Error in Submitting fee!' })
+  async submitFee(@Body() feeSubmissionDto: FeeSubmissionDto) {
+    const result = await this.formService.saveFee(feeSubmissionDto);
+    return {
+      message: 'fee submitted successfully!',
+      uuid: result.uuid,
+      customId:result.customId,
+      data: result,
+    };
+  }
+
+  @Patch('fee/update')
+  @ApiOperation({ summary: 'Update Fee Status' })
+  @ApiResponse({ status: 200, description: 'Fee Status Updated successfully!' })
+  @ApiResponse({ status: 500, description: 'Error in Updating fee!' })
+  async updateFeeStatus(@Query('uuid') uuid: string, @Body() feeSubmissionDto: FeeSubmissionDto) {
+    const result = await this.formService.updateFeeData(uuid, feeSubmissionDto);
+    return {
+      message: 'Fee status updated successfully!',
+      data: result,
+    };
+  }
+
+
+  @Get('fee/details')
+  @ApiOperation({ summary: 'Get all Data' })
+  @ApiResponse({ status: 200, description: 'Fee Data retrieved successfully!' })
+  async getAllFeeDetails() {
+    return {
+      message: 'Fee submissions retrieved successfully!',
+      data: await this.formService.getFeeDetails(),
+    };
+  }
 }
+
+
