@@ -171,6 +171,9 @@ export class FormService {
         { id: 'firstInstallment', title: 'First Installment' },
         { id: 'secondInstallment', title: 'Second Installment' },
         { id: 'thirdInstallment', title: 'Third Installment' },
+        {id:'firstInstallmentStatus',title:'First Installment Status'},
+        {id:'secondInstallmentStatus',title:'Second Installment Status'},
+        {id:'thirdInstallmentStatus',title:'Third Installment Status'},
         
       ],
     });
