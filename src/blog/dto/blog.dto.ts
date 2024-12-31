@@ -12,27 +12,16 @@ export class CreateBlogDto {
   @IsNotEmpty()
   content: string;
 
-  @ApiProperty({ description: 'The author of the blog' })
-  @IsString()
-  @IsNotEmpty()
-  author: string;
-
-  @ApiProperty({ description: 'A brief summary of the blog' })
-  @IsString()
+  @ApiProperty({ description: 'Tags related to the blog', type: [String] })
+  @IsString({ each: true })
   @IsOptional()
-  summary?: string;
+  tags?: string[];
 
   @ApiProperty({ description: 'The URL of the blog image' })
   @IsString()
   @IsOptional()
   imageUrl?: string;
-
-  @ApiProperty({ description: 'Tags related to the blog', type: [String] })
-  @IsString({ each: true })
-  @IsOptional()
-  tags?: string[];
 }
-
 
 export class UpdateBlogDto {
   @ApiProperty({ description: 'The title of the blog', required: false })
@@ -45,23 +34,13 @@ export class UpdateBlogDto {
   @IsOptional()
   content?: string;
 
-  @ApiProperty({ description: 'The author of the blog', required: false })
-  @IsString()
+  @ApiProperty({ description: 'Tags related to the blog', type: [String], required: false })
+  @IsString({ each: true })
   @IsOptional()
-  author?: string;
-
-  @ApiProperty({ description: 'A brief summary of the blog', required: false })
-  @IsString()
-  @IsOptional()
-  summary?: string;
+  tags?: string[];
 
   @ApiProperty({ description: 'The URL of the blog image', required: false })
   @IsString()
   @IsOptional()
   imageUrl?: string;
-
-  @ApiProperty({ description: 'Tags related to the blog', type: [String], required: false })
-  @IsString({ each: true })
-  @IsOptional()
-  tags?: string[];
 }

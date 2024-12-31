@@ -13,27 +13,33 @@ export class BlogService {
 
   async createBlog(blogDto: CreateBlogDto): Promise<Blog> {
     const blog = this.blogRepository.create(blogDto);
-    return await this.blogRepository.save(blog);
+    return this.blogRepository.save(blog);
   }
 
   async updateBlog(id: number, updateDto: UpdateBlogDto): Promise<Blog> {
     const blog = await this.blogRepository.preload({ id, ...updateDto });
-    if (!blog) throw new NotFoundException('Blog not found');
-    return await this.blogRepository.save(blog);
+    if (!blog) {
+      throw new NotFoundException(`Blog with ID ${id} not found`);
+    }
+    return this.blogRepository.save(blog);
   }
 
   async deleteBlog(id: number): Promise<void> {
     const result = await this.blogRepository.delete(id);
-    if (result.affected === 0) throw new NotFoundException('Blog not found');
+    if (result.affected === 0) {
+      throw new NotFoundException(`Blog with ID ${id} not found`);
+    }
   }
 
   async getAllBlogs(): Promise<Blog[]> {
-    return await this.blogRepository.find({ order: { createdAt: 'DESC' } });
+    return this.blogRepository.find({ order: { createdAt: 'DESC' } });
   }
 
   async getBlogById(id: number): Promise<Blog> {
     const blog = await this.blogRepository.findOne({ where: { id } });
-    if (!blog) throw new NotFoundException('Blog not found');
+    if (!blog) {
+      throw new NotFoundException(`Blog with ID ${id} not found`);
+    }
     return blog;
   }
 }
