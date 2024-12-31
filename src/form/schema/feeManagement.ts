@@ -17,14 +17,23 @@ class FeeManagement {
   @Column({ type: 'varchar', length: 15, nullable: false })
   mobileNumber: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false, default: '0' })
+  @Column({ type: 'varchar', length: 255, nullable: false, default: 'No' })
   firstInstallment?: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false, default: '0' })
+  @Column({ type: 'varchar', length: 255, nullable: false, default: 'No' })
   secondInstallment?: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false, default: '0' })
+  @Column({ type: 'varchar', length: 255, nullable: false, default: 'No' })
   thirdInstallment?: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  firstInstallmentStatus?: string;
+  
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  secondInstallmentStatus?: string;
+  
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  thirdInstallmentStatus?: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   customId: string;

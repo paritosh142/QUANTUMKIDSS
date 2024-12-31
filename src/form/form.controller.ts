@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Patch, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Put, Query, Res, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Response } from 'express';
 import { FormService } from './form.service';
 import { CreateFormDto } from './dto/create-form.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -34,12 +35,10 @@ export class FormController {
   @ApiOperation({ summary: 'Grt all Data' })
   @ApiResponse({ status: 200, description: 'Form Data retrieved successfully!' })
   async getAllForms(
-    @Query('offset') offset: string,
-    @Query('pageSize') pageSize: string
   ) {
     return {
       message: 'Form submissions retrieved successfully!',
-      data: await this.formService.getSubmissions(offset ,pageSize),
+      data: await this.formService.getSubmissions(),
     };
   }
   // @Get('status')
@@ -171,6 +170,25 @@ export class FormController {
       message: 'Fee submissions retrieved successfully!',
       data: await this.formService.getFeeDetails(),
     };
+  }
+  @Get('fee/details/csv')
+  @ApiOperation({ summary: 'Get Fee Details as CSV' })
+  @ApiResponse({ status: 200, description: 'CSV file generated successfully!' })
+  async getFeeDetailsCsv(@Res() res: Response) {
+    const csvData = await this.formService.getFeeDetailsCsv();
+    res.header('Content-Type', 'text/csv');
+    res.attachment('fee-details.csv');
+    res.send(csvData);
+  }
+
+  @Get('lead/csv')
+  @ApiOperation({ summary: 'Get Lead Details as CSV' })
+  @ApiResponse({ status: 200, description: 'CSV file generated successfully!' })
+  async getLeadDetailCsv(@Res() res: Response) {
+    const csvData = await this.formService.getLeadDetailsCsv();
+    res.header('Content-Type', 'text/csv');
+    res.attachment('lead-details.csv');
+    res.send(csvData);
   }
 }
 

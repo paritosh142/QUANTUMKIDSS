@@ -41,5 +41,20 @@ export class FeeSubmissionDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  firstInstallmentStatus: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  secondInstallmentStatus: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  thirdInstallmentStatus: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   customId: string;
 }
