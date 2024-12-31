@@ -11,7 +11,7 @@ export class Blog {
   @Column({ type: 'text' })
   content: string;
 
-  @Column({ type: 'simple-array' })
+  @Column({ type: 'simple-array', nullable: true })
   tags: string[];
 
   @Column({ type: 'varchar', length: 255, nullable: true })
