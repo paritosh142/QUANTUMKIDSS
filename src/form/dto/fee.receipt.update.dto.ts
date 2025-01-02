@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsString, IsEmail, IsMobilePhone, IsNotEmpty } from 'class-validator';
 
-export class EnqueryFormDto {
+export class FeeReceiptUpdateDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -13,37 +13,42 @@ export class EnqueryFormDto {
   lastName: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  class: string;
+
+  @ApiProperty()
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  address: string;
-
-  @ApiProperty()
-  @IsString()
+  @IsMobilePhone()
   @IsNotEmpty()
   mobileNumber: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  gender: string;
+  totalYearlyPayment: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  firstInstallment: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  secondInstallment: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  thirdInstallment: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   customId: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  class: string;
-
-  @ApiProperty({ type: Boolean, default: false })
-  @IsBoolean()
-  @IsOptional()
-  showFeeReceipt?: boolean;
 }

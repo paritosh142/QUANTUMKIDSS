@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Patch, Post, Put, Query, Res, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Put,
+  Query,
+  Res,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { FormService } from './form.service';
 import { CreateFormDto } from './dto/create-form.dto';
@@ -7,6 +18,8 @@ import { UpdateFormStatusDto } from './dto/update-status.dto';
 import { Form } from './schema/form.schema';
 import { EnqueryFormDto } from './dto/inquery-form.dto';
 import { FeeSubmissionDto } from './dto/fee-submit.dto';
+import { FeeReceiptDto } from './dto/Fee.receipt.dto';
+import { FeeReceiptUpdateDto } from './dto/fee.receipt.update.dto';
 
 @Controller('form')
 export class FormController {
@@ -20,7 +33,7 @@ export class FormController {
       return {
         message: 'Form submitted successfully!',
         uuid: result.uuid,
-        customId:result.customId,
+        customId: result.customId,
         data: result,
       };
     } catch (error) {
@@ -33,9 +46,11 @@ export class FormController {
 
   @Get()
   @ApiOperation({ summary: 'Grt all Data' })
-  @ApiResponse({ status: 200, description: 'Form Data retrieved successfully!' })
-  async getAllForms(
-  ) {
+  @ApiResponse({
+    status: 200,
+    description: 'Form Data retrieved successfully!',
+  })
+  async getAllForms() {
     return {
       message: 'Form submissions retrieved successfully!',
       data: await this.formService.getSubmissions(),
@@ -54,13 +69,21 @@ export class FormController {
   // }
   @Get('status')
   @ApiOperation({ summary: 'Get form submissions by status' })
-  @ApiResponse({ status: 200, description: 'Form submissions with the specified status retrieved successfully!' })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Form submissions with the specified status retrieved successfully!',
+  })
   async getFormsByStatus(
     @Query('status') status: string,
     @Query('offset') offset: string,
-    @Query('pageSize') pageSize: string
+    @Query('pageSize') pageSize: string,
   ) {
-    const { data, totalCount } = await this.formService.getSubmissionsByStatus(status , offset , pageSize);
+    const { data, totalCount } = await this.formService.getSubmissionsByStatus(
+      status,
+      offset,
+      pageSize,
+    );
     return {
       message: `Form submissions with status '${status}' retrieved successfully!`,
       data,
@@ -69,14 +92,23 @@ export class FormController {
   }
   @Patch('/updateStatus')
   // @ApiOperation({ summary: 'Update the status of a form' })
-  @ApiResponse({ status: 200, description: 'The status has been successfully updated.', type: Form })
+  @ApiResponse({
+    status: 200,
+    description: 'The status has been successfully updated.',
+    type: Form,
+  })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
-  async updateStatus(@Query() updateFormStatusDto: UpdateFormStatusDto): Promise<Form> {
+  async updateStatus(
+    @Query() updateFormStatusDto: UpdateFormStatusDto,
+  ): Promise<Form> {
     return this.formService.updateStatus(updateFormStatusDto);
   }
 
   @Get('count')
-  @ApiResponse({ status: 200, description: 'Count of leads retrieved successfully!' })
+  @ApiResponse({
+    status: 200,
+    description: 'Count of leads retrieved successfully!',
+  })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   async getCount(@Query('status') status: string) {
     try {
@@ -95,18 +127,20 @@ export class FormController {
   @Post('enqueryForm')
   @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'Get all Data' })
-  @ApiResponse({ status: 200, description: 'EnqueryForm Data Created successfully!' })
+  @ApiResponse({
+    status: 200,
+    description: 'EnqueryForm Data Created successfully!',
+  })
   @ApiResponse({ status: 500, description: 'Error in Submitting form!' })
   async submitInquiryForm(@Body() enqueryFormDto: EnqueryFormDto) {
-    try{
-      const result  = await this.formService.saveInqueryForm(enqueryFormDto);
+    try {
+      const result = await this.formService.saveInqueryForm(enqueryFormDto);
       return {
         message: 'Form submitted successfully!',
         uuid: result.uuid,
         data: result,
       };
-    }
-    catch(error){
+    } catch (error) {
       return {
         message: 'Failed to submit form',
         error: error.message,
@@ -115,7 +149,10 @@ export class FormController {
   }
   @Get('enqueryForm/get')
   @ApiOperation({ summary: 'Get all Data' })
-  @ApiResponse({ status: 200, description: 'EnqueryForm Data retrieved successfully!' })
+  @ApiResponse({
+    status: 200,
+    description: 'EnqueryForm Data retrieved successfully!',
+  })
   async getAllInquiryForms() {
     return {
       message: 'Form submissions retrieved successfully!',
@@ -123,17 +160,18 @@ export class FormController {
     };
   }
 
-
   @Get('enqueryForm/find')
   @ApiOperation({ summary: 'Get all Data' })
-  @ApiResponse({ status: 200, description: 'EnqueryForm Data retrieved successfully!' })
+  @ApiResponse({
+    status: 200,
+    description: 'EnqueryForm Data retrieved successfully!',
+  })
   async getInquiryForm(@Query('customId') customId: string) {
     return {
       message: 'contact form retrieved successfully!',
       data: await this.formService.getInqueryFormBycustomId(customId),
     };
   }
-
 
   @Post('feeSubmit')
   @ApiOperation({ summary: 'Set user Fee' })
@@ -144,7 +182,7 @@ export class FormController {
     return {
       message: 'fee submitted successfully!',
       uuid: result.uuid,
-      customId:result.customId,
+      customId: result.customId,
       data: result,
     };
   }
@@ -153,14 +191,16 @@ export class FormController {
   @ApiOperation({ summary: 'Update Fee Status' })
   @ApiResponse({ status: 200, description: 'Fee Status Updated successfully!' })
   @ApiResponse({ status: 500, description: 'Error in Updating fee!' })
-  async updateFeeStatus(@Query('uuid') uuid: string, @Body() feeSubmissionDto: FeeSubmissionDto) {
+  async updateFeeStatus(
+    @Query('uuid') uuid: string,
+    @Body() feeSubmissionDto: FeeSubmissionDto,
+  ) {
     const result = await this.formService.updateFeeData(uuid, feeSubmissionDto);
     return {
       message: 'Fee status updated successfully!',
       data: result,
     };
   }
-
 
   @Get('fee/details')
   @ApiOperation({ summary: 'Get all Data' })
@@ -190,6 +230,121 @@ export class FormController {
     res.attachment('lead-details.csv');
     res.send(csvData);
   }
+
+  @Get('class/get')
+  @ApiOperation({ summary: 'Get all Data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Class Data retrieved successfully!',
+  })
+  async getDataByClass(@Query('class') classs: string) {
+    const data = await this.formService.getDataByClassName(classs);
+    if (data) {
+      return {
+        message: 'Class submissions retrieved successfully!',
+        data: data,
+      };
+    }
+    return {
+      message: 'Class not found',
+      data: [],
+    };
+  }
+
+  @Post('class/createReceipt')
+  @ApiOperation({ summary: 'Create Receipt' })
+  @ApiResponse({ status: 200, description: 'Receipt Created successfully!' })
+  @ApiResponse({ status: 500, description: 'Error in Creating Receipt!' })
+  async createClassReceipt(@Body() feeReceipt: FeeReceiptDto) {
+    try {
+      const result = await this.formService.createReceiptForClass(feeReceipt);
+      return {
+        message: 'Receipt Created successfully!',
+        data: result,
+      };
+    } catch (error) {
+      return {
+        message: 'Failed to create receipt',
+        error: error.message,
+      };
+    }
+  }
+  @Patch('class/updateReceipt')
+  @ApiOperation({ summary: 'Update Receipt' })
+  @ApiResponse({ status: 200, description: 'Receipt Updated successfully!' })
+  @ApiResponse({ status: 500, description: 'Error in Updating Receipt!' })
+  async updateClassReceipt(@Body() updateFeeRec: FeeReceiptUpdateDto) {
+    try {
+      const result = await this.formService.updateReceiptForClass(updateFeeRec);
+      return {
+        message: 'Receipt Updated successfully!',
+        data: result,
+      };
+    } catch (error) {
+      return {
+        message: 'Failed to update receipt',
+        error: error.message,
+      };
+    }
+  }
+
+  @Get('getClassName')
+  @ApiResponse({
+    status: 200,
+    description: 'Class Name retrieved successfully!',
+  })
+  async getClassData(@Query('class') className: string) {
+    const data = await this.formService.getByClassName(className);
+    if(data){
+      return {
+        message: 'Class Name retrieved successfully!',
+        data: data,
+      };
+    }
+    return {
+      message: 'Class Name not found',
+      data: [],
+    }
+  }
+
+  @Get('class/receipt')
+  @ApiOperation({ summary: 'Get all Data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Receipt Data retrieved successfully!',
+  })
+  async checkStudentFee(@Query('customId') customId: string) {
+    const data = await this.formService.checkStudentFeePresent(customId);
+    if (data) {
+      return {
+        message: 'Receipts data is already present!',
+        data: data,
+      };
+    }
+    return {
+      message: 'Receipts data is not present!',
+      data: data,
+    };
+  }
+
+  @Get('getAllClass/receipt')
+  @ApiOperation({ summary: 'Get all Data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Receipt Data retrieved successfully!',
+  })
+  @ApiResponse({ status: 500, description: 'Error in getting Receipt!' })
+  async getAllClassReceipt() {
+    const res = await this.formService.getAllFeeReceipt();
+    if (res) {
+      return {
+        message: 'Receipts data retrieved successfully!',
+        data: res,
+      };
+    }
+    return {
+      message: 'Receipts data not found!',
+      data: [],
+    };
+  }
 }
-
-
