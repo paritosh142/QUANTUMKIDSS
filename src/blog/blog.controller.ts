@@ -10,13 +10,17 @@ import {
   UseInterceptors,
   UsePipes,
   ValidationPipe,
+  Req,
+  Res,
 } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BlogService } from './blog.service';
 import { CreateBlogDto, UpdateBlogDto } from './dto/blog.dto';
-
+import * as fs from 'fs';
+import * as path from 'path';
 @Controller('blogs')
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
@@ -48,10 +52,24 @@ export class BlogController {
   }
 
   @Get()
-  async getAllBlogs() {
-    return this.blogService.getAllBlogs();
+  async getAllBlogs(@Req() req: Request, @Res() res: Response) {
+    try {
+      const blogs = await this.blogService.getAllBlogs();
+      blogs.forEach(member => {
+        if (member.imageUrl) {
+          member.imageUrl = `${req.protocol}://${req.get('host')}${member.imageUrl}`;
+        }
+      });
+      res.json(blogs);
+    } catch (error) {
+      res.status(500).json({
+        message: 'Failed to fetch members',
+        error: error.message,
+      });
+    }
   }
 
+  
   @Get(':id')
   async getBlogById(@Param('id') id: string) {
     return this.blogService.getBlogById(Number(id));

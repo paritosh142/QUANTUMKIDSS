@@ -28,7 +28,7 @@ import FeeManagement from './form/schema/feeManagement';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'Password@0000',
+      password: 'gAuravnegi',
       database: 'quantum',
       entities: [Form,FeeManagement,StudentForm,AddTeam,Admin,Blog,NewsEvent,Picture, __dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
