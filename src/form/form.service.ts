@@ -11,6 +11,9 @@ import StudentForm from './schema/inqueryschema';
 import { EnqueryFormDto } from './dto/inquery-form.dto';
 import FeeManagement from './schema/feeManagement';
 import { FeeSubmissionDto } from './dto/fee-submit.dto';
+import { FeeReceiptDto } from './dto/Fee.receipt.dto';
+import { FeeReceiptSchema } from './schema/Fee.receipt.schema';
+import { FeeReceiptUpdateDto } from './dto/fee.receipt.update.dto';
 
 export interface SubmissionsResult {
   data: Form[];
@@ -34,6 +37,8 @@ export class FormService {
     private studentFormRepository: Repository<StudentForm>,
     @InjectRepository(FeeManagement)
     private feeRepository: Repository<FeeManagement>,
+    @InjectRepository(FeeReceiptSchema)
+    private feeReceiptRepository: Repository<FeeReceiptSchema>,
   ) {
     console.log("Your form name : ", Form.name);
   }
@@ -201,5 +206,58 @@ export class FormService {
     const csvData = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(leadDetails.data);
     return csvData;
   }
+  async getDataByClassName(classs: string): Promise<StudentForm[]> {
+    const resp = await this.studentFormRepository.find({ where: { class: classs } });
+    if(resp){
+      return resp;
+    }
+    return null;
+  }
+  async createReceiptForClass(feeReceipt: FeeReceiptDto): Promise<FeeReceiptSchema> {
+    try {
+      const newFeeReceipt = this.feeReceiptRepository.create({
+        ...feeReceipt,
+        uuid: uuidv4(),
+      });
+      
+      const savedFeeReceipt = await this.feeReceiptRepository.save(newFeeReceipt);
+
+      return savedFeeReceipt;  
+    } catch (error) {
+      throw new Error(`Failed to save fee receipt: ${error.message}`);
+    }
+  }
   
+
+  async checkStudentFeePresent(customId: string): Promise<boolean> {
+      const res = await this.feeReceiptRepository.find({
+        where: { customId: customId }
+      });
+      return res.length > 0;
+  }
+
+  async getAllFeeReceipt(){
+    const res = await this.feeReceiptRepository.find();
+    if(res){
+      return res;
+    }
+    return null;
+  }
+  async updateReceiptForClass(updateFeeRec: FeeReceiptUpdateDto): Promise<FeeReceiptSchema> {
+    const feeReceipt = await this.feeReceiptRepository.findOne({ where: { customId: updateFeeRec.customId } });
+    if (!feeReceipt) {
+      throw new BadRequestException('Fee receipt not found');
+    }
+    Object.assign(feeReceipt, updateFeeRec);
+    return this.feeReceiptRepository.save(feeReceipt);
+  }
+
+  async getByClassName(className:string):Promise<FeeReceiptSchema>{
+    const findData = await this.feeReceiptRepository.findOne({where:{class:className}});
+    if(findData){
+      return findData;
+    }
+    return null;
+
+  }
 }

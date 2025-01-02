@@ -1,16 +1,8 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToMany,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Form } from './form.schema';
+import { IsString, IsEmail, IsMobilePhone, IsNotEmpty, IsNumberString } from 'class-validator';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-class StudentForm {
+export class FeeReceiptSchema {
   @PrimaryGeneratedColumn('uuid')
   uuid: string;
 
@@ -24,25 +16,23 @@ class StudentForm {
   email: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
-  address: string;
-
+  class: string;
+  
   @Column({ type: 'varchar', length: 15, nullable: false })
   mobileNumber: string;
 
-  @Column({type: 'varchar', length: 255, nullable: false})
-  gender :string;
-  
   @Column({ type: 'varchar', length: 255, nullable: false })
-  class:string;
-  
-  @CreateDateColumn()
-  submittedAt: Date;
+  totalYearlyPayment: string;
 
-  @Column({ type: 'boolean', nullable: false, default: false })
-  showFeeReceipt?: boolean;
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  firstInstallment: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  secondInstallment: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  thirdInstallment: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   customId: string;
 }
-
-export default StudentForm;
