@@ -26,13 +26,13 @@ class FeeManagement {
   @Column({ type: 'varchar', length: 255, nullable: false, default: 'No' })
   thirdInstallment?: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false, default: 'Pending' })
   firstInstallmentStatus?: string;
   
-  @Column({ type: 'varchar', length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false, default: 'Pending' })
   secondInstallmentStatus?: string;
   
-  @Column({ type: 'varchar', length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false, default: 'Pending' })
   thirdInstallmentStatus?: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })

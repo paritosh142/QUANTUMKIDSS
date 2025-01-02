@@ -98,12 +98,13 @@ export class FormService {
       const newForm = this.studentFormRepository.create({
         ...enqueryFormDto,
         uuid: uuidv4(),
-        // formEnqueryId: this.generateEnqueryId(),
       });
-      const saveIn  = this.feeRepository.create({
+
+      const saveIn = this.feeRepository.create({
         ...enqueryFormDto,
         uuid: uuidv4(),
-      })
+      });
+
       await this.feeRepository.save(saveIn);
       return await this.studentFormRepository.save(newForm);
     } catch (error) {
