@@ -13,12 +13,18 @@ export class PictureGalleryService {
 
   async createPicture(dto: CreatePictureDto): Promise<Picture> {
     const picture = this.pictureRepository.create(dto);
+    if (dto.image) {
+      picture.image = dto.image;
+    }
     return this.pictureRepository.save(picture);
   }
 
   async updatePicture(id: number, dto: UpdatePictureDto): Promise<Picture> {
     const picture = await this.pictureRepository.preload({ id, ...dto });
     if (!picture) throw new NotFoundException('Picture not found');
+    if (dto.image) {
+      picture.image = dto.image;
+    }
     return this.pictureRepository.save(picture);
   }
 

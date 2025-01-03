@@ -29,7 +29,7 @@ import { FeeReceiptSchema } from './form/schema/Fee.receipt.schema';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'gAuravnegi',
+      password: 'Password@0000',
       database: 'quantum',
       entities: [Form,FeeReceiptSchema,FeeManagement,StudentForm,AddTeam,Admin,Blog,NewsEvent,Picture, __dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
