@@ -43,4 +43,5 @@ export class CreateFormDto {
   @IsEnum(['raw', 'interested', 'converted', 'pending', 'notInterested', "visitScheduled" ,"formFilled",
       "admitted"])
   type: string = 'raw';
+  
 }

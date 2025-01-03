@@ -2,9 +2,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToMany,
-  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Form } from './form.schema';
@@ -29,12 +26,12 @@ class StudentForm {
   @Column({ type: 'varchar', length: 15, nullable: false })
   mobileNumber: string;
 
-  @Column({type: 'varchar', length: 255, nullable: false})
-  gender :string;
-  
   @Column({ type: 'varchar', length: 255, nullable: false })
-  class:string;
-  
+  gender: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  class: string;
+
   @CreateDateColumn()
   submittedAt: Date;
 
@@ -43,6 +40,9 @@ class StudentForm {
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   customId: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  applicantId: string;
 }
 
 export default StudentForm;

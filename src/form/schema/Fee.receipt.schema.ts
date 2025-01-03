@@ -35,4 +35,7 @@ export class FeeReceiptSchema {
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   customId: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  applicantId: string;
 }

@@ -42,7 +42,34 @@ export class FormService {
   ) {
     console.log("Your form name : ", Form.name);
   }
+  async generateApplicantId(candidateName: string): Promise<string> {
+    // Get the current year (last two digits)
+    const year = new Date().getFullYear().toString().slice(-2);
+  
 
+    const lastApplicant = await this.studentFormRepository.findOne({
+      order: { applicantId: 'DESC' },
+      where: {},
+    });
+  
+    let applicantNumber = 1;
+  
+    if (lastApplicant) {
+
+      const numberPart = lastApplicant.applicantId.split('-')[0].split(' ')[1];
+      applicantNumber = parseInt(numberPart, 10) + 1;
+    }
+  
+
+    const applicantNumberString = applicantNumber.toString().padStart(4, '0');
+  
+
+    const namePart = candidateName.substring(0, 3).toUpperCase();
+  
+
+    return `QK-${applicantNumberString}-${year}-${namePart}`;
+  }
+  
   private generateCustomId(): string {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let result = 'QK-';
@@ -100,17 +127,15 @@ export class FormService {
   }
   async saveInqueryForm(enqueryFormDto: EnqueryFormDto): Promise<StudentForm> {
     try {
+      const applicantId = await this.generateApplicantId(enqueryFormDto.firstName);
+      // const customId = this.generateCustomId();
+
       const newForm = this.studentFormRepository.create({
         ...enqueryFormDto,
         uuid: uuidv4(),
+        applicantId,
       });
 
-      const saveIn = this.feeRepository.create({
-        ...enqueryFormDto,
-        uuid: uuidv4(),
-      });
-
-      await this.feeRepository.save(saveIn);
       return await this.studentFormRepository.save(newForm);
     } catch (error) {
       throw new Error(`Failed to save form: ${error.message}`);
