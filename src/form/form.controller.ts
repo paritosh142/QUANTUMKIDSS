@@ -139,6 +139,7 @@ export class FormController {
         message: 'Form submitted successfully!',
         uuid: result.uuid,
         data: result,
+        applicantId: result.applicantId,
       };
     } catch (error) {
       return {

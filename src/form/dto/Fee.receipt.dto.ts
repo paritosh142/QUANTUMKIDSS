@@ -51,4 +51,9 @@ export class FeeReceiptDto {
   @IsString()
   @IsNotEmpty()
   customId: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  applicantId: string;
 }

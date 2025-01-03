@@ -19,6 +19,8 @@ import { AddTeam } from './AddTeam/schema/teamAdd.schema';
 import StudentForm from './form/schema/inqueryschema';
 import FeeManagement from './form/schema/feeManagement';
 import { FeeReceiptSchema } from './form/schema/Fee.receipt.schema';
+import { FeeReceiptGenerateModule } from './fee-receipt-generate/fee-receipt-generate.module';
+import { FeeReceiptGenerate } from './fee-receipt-generate/entities/fee-receipt-generate.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,7 +33,7 @@ import { FeeReceiptSchema } from './form/schema/Fee.receipt.schema';
       username: 'root',
       password: 'Password@0000',
       database: 'quantum',
-      entities: [Form,FeeReceiptSchema,FeeManagement,StudentForm,AddTeam,Admin,Blog,NewsEvent,Picture, __dirname + '/**/*.entity{.ts,.js}'],
+      entities: [Form,FeeReceiptSchema,,FeeReceiptGenerate,FeeManagement,StudentForm,AddTeam,Admin,Blog,NewsEvent,Picture, __dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
     FormModule,
@@ -39,7 +41,9 @@ import { FeeReceiptSchema } from './form/schema/Fee.receipt.schema';
     BlogModule,
     NewsEventModule,
     PictureGalleryModule,
-    TeamAddModule
+    TeamAddModule,
+    FeeReceiptGenerateModule,
+    FeeReceiptGenerateModule
   ],
   controllers: [AppController],
   providers: [AppService],
