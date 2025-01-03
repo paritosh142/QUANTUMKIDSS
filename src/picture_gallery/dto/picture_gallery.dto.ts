@@ -1,5 +1,6 @@
-  import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Column } from 'typeorm';
 
 export class CreatePictureDto {
   @ApiProperty({ description: 'The title of the picture' })
@@ -7,10 +8,10 @@ export class CreatePictureDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ description: 'The URL of the image' })
+  @ApiProperty({ description: 'The image of the picture', required: false })
   @IsString()
-  @IsNotEmpty()
-  imageUrl: string;
+  @IsOptional()
+  image?: string;
 }
 
 export class UpdatePictureDto {
@@ -19,8 +20,8 @@ export class UpdatePictureDto {
   @IsOptional()
   title?: string;
 
-  @ApiProperty({ description: 'The URL of the image', required: false })
+  @ApiProperty({ description: 'The image of the picture', required: false })
   @IsString()
   @IsOptional()
-  imageUrl?: string;
+  image?: string;
 }
