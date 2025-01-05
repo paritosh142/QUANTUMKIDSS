@@ -31,7 +31,7 @@ import { FeeReceiptGenerate } from './fee-receipt-generate/entities/fee-receipt-
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'Password@0000',
+      password: 'gAuravnegi',
       database: 'quantum',
       entities: [Form,FeeReceiptSchema,,FeeReceiptGenerate,FeeManagement,StudentForm,AddTeam,Admin,Blog,NewsEvent,Picture, __dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,

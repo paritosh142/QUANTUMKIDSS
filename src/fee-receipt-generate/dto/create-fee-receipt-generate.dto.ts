@@ -1,5 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsDateString,
+} from 'class-validator';
 
 export class CreateFeeReceiptGenerateDto {
   @ApiProperty({
@@ -62,4 +67,36 @@ export class CreateFeeReceiptGenerateDto {
   @IsDateString()
   @IsOptional()
   thirdInstallmentDate?: string;
+
+  @ApiProperty({
+    description: 'Applicant ID',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  applicantId?: string;
+
+  @ApiProperty({
+    description: 'First Name',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  firstName?: string;
+
+  @ApiProperty({
+    description: 'Last Name',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  lastName?: string;
+
+  @ApiProperty({
+    description: 'Class',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  class?: string;
 }
