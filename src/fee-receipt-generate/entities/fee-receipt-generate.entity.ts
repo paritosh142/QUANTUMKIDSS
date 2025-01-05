@@ -25,4 +25,16 @@ export class FeeReceiptGenerate {
 
     @Column({ type: 'date', nullable: true })
     thirdInstallmentDate?: Date;
+
+    @Column({ type: 'varchar', length: 255, nullable: true, default: '0' })
+    applicantId?: string;
+
+    @Column({ type: 'varchar', length: 255, nullable: true, default: '0' })
+    class?: string;
+
+    @Column({ type: 'varchar', length: 255, nullable: true, default: '0' })
+    firstName?: string;
+
+    @Column({ type: 'varchar', length: 255, nullable: true, default: '0' })
+    lastName?: string;
 }

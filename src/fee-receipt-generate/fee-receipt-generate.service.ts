@@ -12,7 +12,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FeeReceiptGenerate } from './entities/fee-receipt-generate.entity';
 import { v4 as uuidv4 } from 'uuid';
-
+import { createObjectCsvStringifier } from 'csv-writer';
+export interface FeeSubmit {
+  data: FeeReceiptGenerate[];
+  totalCount: number;
+}
 @Injectable()
 export class FeeReceiptGenerateService {
   constructor(
@@ -125,6 +129,35 @@ export class FeeReceiptGenerateService {
       throw new InternalServerErrorException('Failed to generate PDF');
     }
   }
+   async getFeeDetails(): Promise<FeeSubmit> {
+      const [data, totalCount] = await this.feeReceiptGenerateRepository.findAndCount();
+      return {
+        data,
+        totalCount,
+      };
+    }
   
+  async getFeeDetailsCsv(): Promise<string> {
+      const feeDetails = await this.getFeeDetails();
+  
+      const csvStringifier = createObjectCsvStringifier({
+        header: [
+          { id: 'customId', title: 'Custom ID' },
+          {id : 'applicantId', title: 'Applicant ID'},
+          { id: 'firstName', title: 'First Name' },
+          { id: 'lastName', title: 'Last Name' },
+          {id:'class', title:'Class'},
+          { id: 'firstInstallment', title: 'First Installment' },
+          { id: 'secondInstallment', title: 'Second Installment' },
+          { id: 'thirdInstallment', title: 'Third Installment' },
+          {id:'firstInstallmentDate',title:'First Installment Status'},
+          {id:'secondInstallmentDate',title:'Second Installment Status'},
+          {id:'thirdInstallmentDate',title:'Third Installment Status'},
+          
+        ],
+      });
+      const csvData = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(feeDetails.data);
+      return csvData;
+    }
 }
 
