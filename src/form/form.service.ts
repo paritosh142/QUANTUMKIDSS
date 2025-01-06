@@ -67,15 +67,6 @@ export class FormService {
     const namePart = candidateName.substring(0, 3).toUpperCase();
     return `QK-${applicantNumberString}-${year}-${namePart}`;
   }
-  
-  // private generateCustomId(): string {
-  //   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  //   let result = 'QK-';
-  //   for (let i = 0; i < 6; i++) {
-  //     result += characters.charAt(Math.floor(Math.random() * characters.length));
-  //   }
-  //   return result;
-  // }
   private async generateCustomId(): Promise<string> {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let customId = '';
@@ -102,6 +93,15 @@ export class FormService {
   
     return customId;
   }
+  // private generateCustomId(): string {
+  //   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  //   let result = 'QK-';
+  //   for (let i = 0; i < 6; i++) {
+  //     result += characters.charAt(Math.floor(Math.random() * characters.length));
+  //   }
+  //   return result;
+  // }
+  
   async saveForm(createFormDto: CreateFormDto): Promise<Form> {
     try {
       const newForm = this.formRepository.create({
