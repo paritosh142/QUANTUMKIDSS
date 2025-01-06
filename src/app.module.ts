@@ -28,10 +28,10 @@ import { FeeReceiptGenerate } from './fee-receipt-generate/entities/fee-receipt-
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: '132.148.179.19',
       port: 3306,
-      username: 'root',
-      password: 'gAuravnegi',
+      username: 'developersqk_2025',
+      password: 'quantumkids@2025',
       database: 'quantum',
       entities: [Form,FeeReceiptSchema,,FeeReceiptGenerate,FeeManagement,StudentForm,AddTeam,Admin,Blog,NewsEvent,Picture, __dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,

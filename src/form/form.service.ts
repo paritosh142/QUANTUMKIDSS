@@ -43,30 +43,28 @@ export class FormService {
     console.log("Your form name : ", Form.name);
   }
   async generateApplicantId(candidateName: string): Promise<string> {
-    // Get the current year (last two digits)
     const year = new Date().getFullYear().toString().slice(-2);
-  
-
     const lastApplicant = await this.studentFormRepository.findOne({
       order: { applicantId: 'DESC' },
       where: {},
     });
   
     let applicantNumber = 1;
-  
+    // if (lastApplicant) {
+
+    //   const numberPart = lastApplicant.applicantId.split('-')[0].split(' ')[1];
+    //   applicantNumber = parseInt(numberPart, 10) + 1;
+    // }
     if (lastApplicant) {
-
-      const numberPart = lastApplicant.applicantId.split('-')[0].split(' ')[1];
-      applicantNumber = parseInt(numberPart, 10) + 1;
+      const match = lastApplicant.applicantId.match(/^QK-(\d+)-\d{2}-[A-Z]{3}$/);
+      if (match) {
+        applicantNumber = parseInt(match[1], 10) + 1;
+      } else {
+        throw new Error(`Invalid applicantId format: ${lastApplicant.applicantId}`);
+      }
     }
-  
-
     const applicantNumberString = applicantNumber.toString().padStart(4, '0');
-  
-
     const namePart = candidateName.substring(0, 3).toUpperCase();
-  
-
     return `QK-${applicantNumberString}-${year}-${namePart}`;
   }
   
@@ -144,7 +142,14 @@ export class FormService {
 
   async getInqueryForm(): Promise<InqueryResult> {
     // const skip = (parseInt(offset) - 1) * parseInt(pageSize);
-    const [data, totalCount] = await this.studentFormRepository.findAndCount();
+    // const [data, totalCount] = await this.studentFormRepository.findAndCount();
+    // return {
+    //   data,
+    //   totalCount,
+    // };
+    const [data, totalCount] = await this.studentFormRepository.findAndCount({
+      order: { submittedAt: 'DESC' }, 
+    });
     return {
       data,
       totalCount,
