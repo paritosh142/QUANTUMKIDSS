@@ -97,4 +97,14 @@ export class UpdateFeeReceiptGenerateDto {
   @IsString()
   @IsOptional()
   class?: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  pendingFee: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  totalYearlyPayment: string;
 }
