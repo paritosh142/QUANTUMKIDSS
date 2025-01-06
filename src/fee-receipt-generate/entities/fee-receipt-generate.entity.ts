@@ -37,4 +37,11 @@ export class FeeReceiptGenerate {
 
     @Column({ type: 'varchar', length: 255, nullable: true, default: '0' })
     lastName?: string;
+
+    @Column({ type: 'varchar', length: 255, nullable: true, default: '0' })
+    pendingFee?: string;
+
+    @Column({ type: 'varchar', length: 255, nullable: true, default: '0' })
+    totalYearlyPayment?: string;
+
 }
