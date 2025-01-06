@@ -136,7 +136,7 @@ export class FeeReceiptGenerateService {
   
       // School name
       doc
-        .fontSize(24)
+        .fontSize(20)
         .font('Helvetica-Bold')
         .fillColor('#333333')
         .text('Quantum School', doc.page.margins.left, doc.page.margins.top + 20, {
@@ -146,7 +146,7 @@ export class FeeReceiptGenerateService {
   
       // Receipt title
       doc
-        .fontSize(16)
+        .fontSize(12)
         .font('Helvetica')
         .text('Fee Receipt', {
           align: 'center',
@@ -167,7 +167,7 @@ export class FeeReceiptGenerateService {
   
       // Display IDs in a structured layout
       doc
-        .fontSize(12)
+        .fontSize(10)
         .font('Helvetica-Bold')
         .fillColor('#444444');
   
@@ -199,7 +199,7 @@ export class FeeReceiptGenerateService {
         .fill('#e6e6e6');
   
       doc
-        .fontSize(12)
+        .fontSize(10)
         .font('Helvetica-Bold')
         .fillColor('#333333');
   
@@ -228,7 +228,7 @@ export class FeeReceiptGenerateService {
   
         doc
           .font(i === 0 ? 'Helvetica-Bold' : 'Helvetica')
-          .fontSize(11)
+          .fontSize(9)
           .fillColor('#333333')
           .text(row[0], doc.page.margins.left + 10, currentY + 8, {
             width: colWidth - 20
@@ -253,7 +253,7 @@ export class FeeReceiptGenerateService {
   
       const currentDate = new Date().toLocaleDateString();
       doc
-        .fontSize(10)
+        .fontSize(9)
         .font('Helvetica')
         .fillColor('#666666')
         .text(`Generated on: ${currentDate}`, doc.page.margins.left, footerY + 15, {
@@ -262,21 +262,21 @@ export class FeeReceiptGenerateService {
         });
   
       // Page numbers
-      const pages = doc.bufferedPageRange();
-      for (let i = 0; i < pages.count; i++) {
-        doc.switchToPage(i);
-        doc
-          .fontSize(10)
-          .text(
-            `Page ${i + 1} of ${pages.count}`,
-            doc.page.margins.left,
-            doc.page.height - 50,
-            {
-              align: 'center',
-              width: pageWidth
-            }
-          );
-      }
+      // const pages = doc.bufferedPageRange();
+      // for (let i = 0; i < pages.count; i++) {
+      //   doc.switchToPage(i);
+      //   doc
+      //     .fontSize(9)
+      //     .text(
+      //       `Page ${i + 1} of ${pages.count}`,
+      //       doc.page.margins.left,
+      //       doc.page.height - 50,
+      //       {
+      //         align: 'center',
+      //         width: pageWidth
+      //       }
+      //     );
+      // }
   
       doc.end();
     } catch (error) {
