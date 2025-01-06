@@ -9,6 +9,7 @@ import {
   NotFoundException,
   Query,
   Res,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { FeeReceiptGenerateService } from './fee-receipt-generate.service';
@@ -67,12 +68,17 @@ export class FeeReceiptGenerateController {
   @Get('getReceipt')
   @ApiOperation({ summary: 'Get Fee Receipt as PDF' })
   @ApiResponse({ status: 200, description: 'PDF file generated successfully!' })
-  async getReceipt(@Query('customId') customId: string, @Res() res: Response) {
-    const response=  this.feeReceiptGenerateService.getReceipt(customId, res);
-    if(response){
-      return response;
+  async getReceipt( @Query('customId') customId: string,
+  @Query('applicantId') applicantId: string, @Res() res: Response) {
+    try {
+      await this.feeReceiptGenerateService.getReceipt(customId,applicantId, res);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('Failed to generate PDF');
+      }
     }
-
   }
   @Get('fee/details/csv')
   @ApiOperation({ summary: 'Get Fee Details as CSV' })

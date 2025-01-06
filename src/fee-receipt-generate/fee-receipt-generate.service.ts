@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import PDFDocument from 'pdfkit';
+import * as PDFDocument from 'pdfkit';
 import { Response } from 'express';
 import { CreateFeeReceiptGenerateDto } from './dto/create-fee-receipt-generate.dto';
 import { UpdateFeeReceiptGenerateDto } from './dto/update-fee-receipt-generate.dto';
@@ -93,16 +93,21 @@ export class FeeReceiptGenerateService {
     }
   }
 
-  async getReceipt(customId: string, res: Response) {
+  async getReceipt(customId: string, applicantId: string, res: Response): Promise<void> {
     const feeReceipt = await this.feeReceiptGenerateRepository.findOne({ where: { customId } });
+  
     if (!feeReceipt) {
       throw new NotFoundException(`Fee receipt with ID ${customId} not found.`);
     }
   
     try {
-      const doc = new PDFDocument();
-      let buffers = [];
+      const doc = new PDFDocument({
+        size: 'A4',
+        margin: 50,
+        bufferPages: true
+      });
   
+      let buffers = [];
       doc.on('data', (chunk) => buffers.push(chunk));
       doc.on('end', () => {
         const pdfData = Buffer.concat(buffers);
@@ -110,18 +115,168 @@ export class FeeReceiptGenerateService {
           .writeHead(200, {
             'Content-Length': Buffer.byteLength(pdfData),
             'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment;filename=receipt-${customId}.pdf`,
+            'Content-Disposition': `attachment;filename=receipt-${`${feeReceipt.firstName}-${feeReceipt.lastName}`}-${applicantId}.pdf`,
           })
           .end(pdfData);
       });
   
-      doc.text(`Fee Receipt for ${customId}`);
-      doc.text(`First Installment: ${feeReceipt.firstInstallment || 'N/A'}`);
-      doc.text(`First Installment Date: ${feeReceipt.firstInstallmentDate || 'N/A'}`);
-      doc.text(`Second Installment: ${feeReceipt.secondInstallment || 'N/A'}`);
-      doc.text(`Second Installment Date: ${feeReceipt.secondInstallmentDate || 'N/A'}`);
-      doc.text(`Third Installment: ${feeReceipt.thirdInstallment || 'N/A'}`);
-      doc.text(`Third Installment Date: ${feeReceipt.thirdInstallmentDate || 'N/A'}`);
+      // Page border
+      const pageWidth = doc.page.width - 2 * doc.page.margins.left;
+      const pageHeight = doc.page.height - 2 * doc.page.margins.top;
+      
+      doc
+        .rect(doc.page.margins.left - 10, doc.page.margins.top - 10,
+              pageWidth + 20, pageHeight + 20)
+        .stroke();
+  
+      // Header section
+      doc
+        .rect(doc.page.margins.left, doc.page.margins.top, pageWidth, 100)
+        .fill('#f6f6f6');
+  
+      // School name
+      doc
+        .fontSize(24)
+        .font('Helvetica-Bold')
+        .fillColor('#333333')
+        .text('Quantum School', doc.page.margins.left, doc.page.margins.top + 20, {
+          align: 'center',
+          width: pageWidth
+        });
+  
+      // Receipt title
+      doc
+        .fontSize(16)
+        .font('Helvetica')
+        .text('Fee Receipt', {
+          align: 'center',
+          width: pageWidth
+        })
+        .moveDown(1);
+  
+      // Generate unique receipt ID (timestamp + random string)
+      const timestamp = new Date().getTime();
+      const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const receiptId = `REC-${timestamp}-${randomString}`;
+  
+      // IDs section with better styling
+      const idSectionY = doc.y;
+      doc
+        .rect(doc.page.margins.left, idSectionY, pageWidth, 80)
+        .fill('#f9f9f9');
+  
+      // Display IDs in a structured layout
+      doc
+        .fontSize(12)
+        .font('Helvetica-Bold')
+        .fillColor('#444444');
+  
+      // Receipt ID
+      doc.text('Receipt ID:', doc.page.margins.left + 20, idSectionY + 15)
+        .font('Helvetica')
+        .text(receiptId, doc.page.margins.left + 120, idSectionY + 15);
+  
+      // Custom ID
+      doc.font('Helvetica-Bold')
+        .text('Custom ID:', doc.page.margins.left + 20, idSectionY + 35)
+        .font('Helvetica')
+        .text(customId, doc.page.margins.left + 120, idSectionY + 35);
+  
+      // Applicant ID
+      doc.font('Helvetica-Bold')
+        .text('Applicant ID:', doc.page.margins.left + 20, idSectionY + 55)
+        .font('Helvetica')
+        .text(applicantId, doc.page.margins.left + 120, idSectionY + 55);
+  
+      // Fee details table
+      const startY = idSectionY + 100;
+      const rowHeight = 30;
+      const colWidth = pageWidth / 2;
+  
+      // Table headers
+      doc
+        .rect(doc.page.margins.left, startY, pageWidth, rowHeight)
+        .fill('#e6e6e6');
+  
+      doc
+        .fontSize(12)
+        .font('Helvetica-Bold')
+        .fillColor('#333333');
+  
+      const tableData = [
+        ['Description', 'Amount/Date'],
+        ['Name', `${feeReceipt.firstName + ' ' + feeReceipt.lastName}`],
+        ['Class', `${feeReceipt.class}`],
+        ['First Installment', `${feeReceipt.firstInstallment || 'pending'}`],
+        ['First Installment Date', `${feeReceipt.firstInstallmentDate || 'N/A'}`],
+        ['Second Installment', `${feeReceipt.secondInstallment || 'pending'}`],
+        ['Second Installment Date', `${feeReceipt.secondInstallmentDate || 'N/A'}`],
+        ['Third Installment', `${feeReceipt.thirdInstallment || 'pending'}`],
+        ['Third Installment Date', `${feeReceipt.thirdInstallmentDate || 'N/A'}`],
+        ['Total Yearly Payment', `${feeReceipt.totalYearlyPayment || 'N/A'}`],
+        ['Pending Fee', `${feeReceipt.pendingFee || 'N/A'}`],
+      ];
+  
+      // Draw table
+      let currentY = startY;
+      tableData.forEach((row, i) => {
+        if (i > 0 && i % 2 === 0) {
+          doc
+            .rect(doc.page.margins.left, currentY, pageWidth, rowHeight)
+            .fill('#f9f9f9');
+        }
+  
+        doc
+          .font(i === 0 ? 'Helvetica-Bold' : 'Helvetica')
+          .fontSize(11)
+          .fillColor('#333333')
+          .text(row[0], doc.page.margins.left + 10, currentY + 8, {
+            width: colWidth - 20
+          })
+          .text(row[1], doc.page.margins.left + colWidth, currentY + 8, {
+            width: colWidth - 20
+          });
+  
+        currentY += rowHeight;
+      });
+  
+      // Table border
+      doc
+        .rect(doc.page.margins.left, startY, pageWidth, currentY - startY)
+        .stroke();
+  
+      // Footer
+      const footerY = doc.page.height - 100;
+      doc
+        .rect(doc.page.margins.left, footerY, pageWidth, 40)
+        .fill('#f6f6f6');
+  
+      const currentDate = new Date().toLocaleDateString();
+      doc
+        .fontSize(10)
+        .font('Helvetica')
+        .fillColor('#666666')
+        .text(`Generated on: ${currentDate}`, doc.page.margins.left, footerY + 15, {
+          align: 'center',
+          width: pageWidth
+        });
+  
+      // Page numbers
+      const pages = doc.bufferedPageRange();
+      for (let i = 0; i < pages.count; i++) {
+        doc.switchToPage(i);
+        doc
+          .fontSize(10)
+          .text(
+            `Page ${i + 1} of ${pages.count}`,
+            doc.page.margins.left,
+            doc.page.height - 50,
+            {
+              align: 'center',
+              width: pageWidth
+            }
+          );
+      }
   
       doc.end();
     } catch (error) {
