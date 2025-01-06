@@ -68,21 +68,46 @@ export class FormService {
     return `QK-${applicantNumberString}-${year}-${namePart}`;
   }
   
-  private generateCustomId(): string {
+  // private generateCustomId(): string {
+  //   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  //   let result = 'QK-';
+  //   for (let i = 0; i < 6; i++) {
+  //     result += characters.charAt(Math.floor(Math.random() * characters.length));
+  //   }
+  //   return result;
+  // }
+  private async generateCustomId(): Promise<string> {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let result = 'QK-';
-    for (let i = 0; i < 6; i++) {
-      result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return result;
-  }
+    let customId = '';
+    let isUnique = false;
+  
+    while (!isUnique) {
 
+      let result = 'QK-';
+      for (let i = 0; i < 6; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      customId = result;
+  
+      // Check database for existing customId
+      const existingForm = await this.formRepository.findOne({
+        where: { customId },
+      });
+  
+
+      if (!existingForm) {
+        isUnique = true;
+      }
+    }
+  
+    return customId;
+  }
   async saveForm(createFormDto: CreateFormDto): Promise<Form> {
     try {
       const newForm = this.formRepository.create({
         ...createFormDto,
         uuid: uuidv4(),
-        customId: this.generateCustomId(),
+        customId: await this.generateCustomId(),
       });
       return this.formRepository.save(newForm);
     } catch (error) {
