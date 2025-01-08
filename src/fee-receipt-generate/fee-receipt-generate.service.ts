@@ -260,7 +260,7 @@ export class FeeReceiptGenerateService {
 
         // Add total payments
         tableData.push(['Total Yearly Payment', `${feeReceipt.totalYearlyPayment || 'N/A'}`]);
-        tableData.push(['Total Pending Fee', `${feeReceipt.pendingFee || 'N/A'}`]);
+        tableData.push(['Total Yearly Pending Fee', `${feeReceipt.pendingFee || 'N/A'}`]);
 
         // Draw table
         let currentY = startY;
