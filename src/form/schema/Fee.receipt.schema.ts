@@ -14,9 +14,12 @@ export class FeeReceiptSchema {
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   email: string;
+  
+  @Column({ type: 'varchar', length: 15, nullable: false })
+  parentName: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
-  class: string;
+  program: string;
   
   @Column({ type: 'varchar', length: 15, nullable: false })
   mobileNumber: string;
