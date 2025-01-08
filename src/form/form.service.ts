@@ -262,7 +262,7 @@ export class FormService {
     return csvData;
   }
   async getDataByClassName(classs: string): Promise<StudentForm[]> {
-    const resp = await this.studentFormRepository.find({ where: { class: classs } });
+    const resp = await this.studentFormRepository.find({ where: { program: classs } });
     if(resp){
       return resp;
     }
