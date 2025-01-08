@@ -21,22 +21,22 @@ class StudentForm {
   email: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
-  address: string;
+  addmissionYear: string;
+  
+  @Column({ type: 'varchar', length: 15, nullable: false })
+  primaryContactName: string;
 
   @Column({ type: 'varchar', length: 15, nullable: false })
   mobileNumber: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false })
-  gender: string;
+  @Column({ type: 'varchar', length: 15, nullable: false })
+  parentName: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
-  class: string;
+  program: string;
 
   @CreateDateColumn()
   submittedAt: Date;
-
-  @Column({ type: 'boolean', nullable: false, default: false })
-  showFeeReceipt?: boolean;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   customId: string;

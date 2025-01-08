@@ -11,17 +11,21 @@ export class Form {
   @Column({ type: 'varchar', length: 255, nullable: false })
   lastName: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
-  email: string;
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  parentName: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
-  address: string;
+  location: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
+  email: string;
 
   @Column({ type: 'varchar', length: 15, nullable: false, unique: true })
   mobileNumber: string;
 
-  @Column({ type: 'enum', enum: ['Admission', 'Fee', 'Curriculum/Program', 'Other'], nullable: false })
-  category: string;
+
+  @Column({ type: 'enum', enum: ['Daycare', 'Playgroup','Nursery', 'LKG', 'UKG'], nullable: false })
+  program: string;
 
   @CreateDateColumn()
   submittedAt: Date;

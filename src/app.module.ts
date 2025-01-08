@@ -21,6 +21,9 @@ import FeeManagement from './form/schema/feeManagement';
 import { FeeReceiptSchema } from './form/schema/Fee.receipt.schema';
 import { FeeReceiptGenerateModule } from './fee-receipt-generate/fee-receipt-generate.module';
 import { FeeReceiptGenerate } from './fee-receipt-generate/entities/fee-receipt-generate.entity';
+
+
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -29,7 +32,7 @@ import { FeeReceiptGenerate } from './fee-receipt-generate/entities/fee-receipt-
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: '132.148.179.19',
-      port: 3306,
+      port: 3306, 
       username: 'developersqk_2025',
       password: 'quantumkids@2025',
       database: 'quantumkids',
@@ -43,7 +46,8 @@ import { FeeReceiptGenerate } from './fee-receipt-generate/entities/fee-receipt-
     PictureGalleryModule,
     TeamAddModule,
     FeeReceiptGenerateModule,
-    FeeReceiptGenerateModule
+    FeeReceiptGenerateModule,
+
   ],
   controllers: [AppController],
   providers: [AppService],

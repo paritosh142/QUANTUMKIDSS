@@ -11,6 +11,10 @@ export class EnqueryFormDto {
   @IsString()
   @IsNotEmpty()
   lastName: string;
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  addmissionYear: string;
 
   @ApiProperty()
   @IsEmail()
@@ -20,17 +24,14 @@ export class EnqueryFormDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  address: string;
+  primaryContactName: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   mobileNumber: string;
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  gender: string;
+
 
   @ApiProperty()
   @IsString()
@@ -40,10 +41,6 @@ export class EnqueryFormDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  class: string;
+  program: string;
 
-  @ApiProperty({ type: Boolean, default: false })
-  @IsBoolean()
-  @IsOptional()
-  showFeeReceipt?: boolean;
 }
