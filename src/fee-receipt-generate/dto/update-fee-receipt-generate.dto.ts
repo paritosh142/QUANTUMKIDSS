@@ -114,6 +114,14 @@ export class UpdateFeeReceiptGenerateDto {
   lastName?: string;
 
   @ApiProperty({
+    description: 'installment number',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  installmentNumber?: string;
+
+  @ApiProperty({
     description: 'Class',
     required: false,
   })

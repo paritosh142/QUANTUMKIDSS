@@ -29,6 +29,14 @@ export class CreateFeeReceiptGenerateDto {
   parentName: string;
   
   @ApiProperty({
+    description: 'installment number',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  installmentNumber?: string;
+
+  @ApiProperty({
     description: 'Select Payment Mode',
   })
   @IsString()
