@@ -93,200 +93,260 @@ export class FeeReceiptGenerateService {
     }
   }
 
-  async getReceipt(customId: string, applicantId: string, res: Response): Promise<void> {
-    const feeReceipt = await this.feeReceiptGenerateRepository.findOne({ where: { customId } });
-  
-    if (!feeReceipt) {
-      throw new NotFoundException(`Fee receipt with ID ${customId} not found.`);
-    }
-  
+  async getReceipt(customId: string, applicantId: string, installmentNumber: string, res: Response): Promise<void> {
     try {
-      const doc = new PDFDocument({
-        size: 'A4',
-        margin: 50,
-        bufferPages: true
-      });
-  
-      let buffers = [];
-      doc.on('data', (chunk) => buffers.push(chunk));
-      doc.on('end', () => {
-        const pdfData = Buffer.concat(buffers);
-        res
-          .writeHead(200, {
-            'Content-Length': Buffer.byteLength(pdfData),
-            'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment;filename=receipt-${`${feeReceipt.firstName}-${feeReceipt.lastName}`}-${applicantId}.pdf`,
-          })
-          .end(pdfData);
-      });
-  
-      // Page border
-      const pageWidth = doc.page.width - 2 * doc.page.margins.left;
-      const pageHeight = doc.page.height - 2 * doc.page.margins.top;
-      
-      doc
-        .rect(doc.page.margins.left - 10, doc.page.margins.top - 10,
-              pageWidth + 20, pageHeight + 20)
-        .stroke();
-  
-      // Header section
-      doc
-        .rect(doc.page.margins.left, doc.page.margins.top, pageWidth, 100)
-        .fill('#f6f6f6');
-  
-      // School name
-      doc
-        .fontSize(20)
-        .font('Helvetica-Bold')
-        .fillColor('#333333')
-        .text('Quantum School', doc.page.margins.left, doc.page.margins.top + 20, {
-          align: 'center',
-          width: pageWidth
-        });
-  
-      // Receipt title
-      doc
-        .fontSize(12)
-        .font('Helvetica')
-        .text('Fee Receipt', {
-          align: 'center',
-          width: pageWidth
-        })
-        .moveDown(1);
-  
-      // Generate unique receipt ID (timestamp + random string)
-      const timestamp = new Date().getTime();
-      const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
-      const receiptId = `REC-${timestamp}-${randomString}`;
-  
-      // IDs section with better styling
-      const idSectionY = doc.y;
-      doc
-        .rect(doc.page.margins.left, idSectionY, pageWidth, 80)
-        .fill('#f9f9f9');
-  
-      // Display IDs in a structured layout
-      doc
-        .fontSize(10)
-        .font('Helvetica-Bold')
-        .fillColor('#444444');
-  
-      // Receipt ID
-      doc.text('Receipt ID:', doc.page.margins.left + 20, idSectionY + 15)
-        .font('Helvetica')
-        .text(receiptId, doc.page.margins.left + 120, idSectionY + 15);
-  
-      // Custom ID
-      doc.font('Helvetica-Bold')
-        .text('Custom ID:', doc.page.margins.left + 20, idSectionY + 35)
-        .font('Helvetica')
-        .text(customId, doc.page.margins.left + 120, idSectionY + 35);
-  
-      // Applicant ID
-      doc.font('Helvetica-Bold')
-        .text('Applicant ID:', doc.page.margins.left + 20, idSectionY + 55)
-        .font('Helvetica')
-        .text(applicantId, doc.page.margins.left + 120, idSectionY + 55);
-  
-      // Fee details table
-      const startY = idSectionY + 100;
-      const rowHeight = 30;
-      const colWidth = pageWidth / 2;
-  
-      // Table headers
-      doc
-        .rect(doc.page.margins.left, startY, pageWidth, rowHeight)
-        .fill('#e6e6e6');
-  
-      doc
-        .fontSize(10)
-        .font('Helvetica-Bold')
-        .fillColor('#333333');
-  
-      const tableData = [
-        ['Description', 'Amount/Date'],
-        ['Name', `${feeReceipt.firstName + ' ' + feeReceipt.lastName}`],
-        ['Program', `${feeReceipt.program}`],
-        ['Parent Name', `${feeReceipt.parentName}`],
-        ['Payment Mode', `${feeReceipt.paymentMode}`],
-        ['Transition Id', `${feeReceipt.transactionId}`],
-        ['First Installment', `${feeReceipt.firstInstallment || 'pending'}`],
-        ['First Installment Date', `${feeReceipt.firstInstallmentDate || 'N/A'}`],
-        ['Second Installment', `${feeReceipt.secondInstallment || 'pending'}`],
-        ['Second Installment Date', `${feeReceipt.secondInstallmentDate || 'N/A'}`],
-        ['Third Installment', `${feeReceipt.thirdInstallment || 'pending'}`],
-        ['Third Installment Date', `${feeReceipt.thirdInstallmentDate || 'N/A'}`],
-        ['Total Yearly Payment', `${feeReceipt.totalYearlyPayment || 'N/A'}`],
-        ['Pending Fee', `${feeReceipt.pendingFee || 'N/A'}`],
-      ];
-  
-      // Draw table
-      let currentY = startY;
-      tableData.forEach((row, i) => {
-        if (i > 0 && i % 2 === 0) {
-          doc
-            .rect(doc.page.margins.left, currentY, pageWidth, rowHeight)
-            .fill('#f9f9f9');
+        // Fetch the fee receipt details
+        const feeReceipt = await this.feeReceiptGenerateRepository.findOne({ where: { customId } });
+
+        if (!feeReceipt) {
+            console.error(`Fee receipt with custom ID ${customId} not found.`);
+            throw new NotFoundException(`Fee receipt with ID ${customId} not found.`);
         }
-  
-        doc
-          .font(i === 0 ? 'Helvetica-Bold' : 'Helvetica')
-          .fontSize(9)
-          .fillColor('#333333')
-          .text(row[0], doc.page.margins.left + 10, currentY + 8, {
-            width: colWidth - 20
-          })
-          .text(row[1], doc.page.margins.left + colWidth, currentY + 8, {
-            width: colWidth - 20
-          });
-  
-        currentY += rowHeight;
-      });
-  
-      // Table border
-      doc
-        .rect(doc.page.margins.left, startY, pageWidth, currentY - startY)
-        .stroke();
-  
-      // Footer
-      const footerY = doc.page.height - 100;
-      doc
-        .rect(doc.page.margins.left, footerY, pageWidth, 40)
-        .fill('#f6f6f6');
-  
-      const currentDate = new Date().toLocaleDateString();
-      doc
-        .fontSize(9)
-        .font('Helvetica')
-        .fillColor('#666666')
-        .text(`Generated on: ${currentDate}`, doc.page.margins.left, footerY + 15, {
-          align: 'center',
-          width: pageWidth
+
+        console.log("Fee receipt fetched successfully.");
+
+        // Store user details in variables
+        const firstName = feeReceipt.firstName;
+        const lastName = feeReceipt.lastName;
+        const program = feeReceipt.program;
+
+        console.log(`User details: ${firstName} ${lastName}, Program: ${program}`);
+
+        const doc = new PDFDocument({
+            size: 'A4',
+            margin: 50,
+            bufferPages: true,
         });
-  
-      // Page numbers
-      // const pages = doc.bufferedPageRange();
-      // for (let i = 0; i < pages.count; i++) {
-      //   doc.switchToPage(i);
-      //   doc
-      //     .fontSize(9)
-      //     .text(
-      //       `Page ${i + 1} of ${pages.count}`,
-      //       doc.page.margins.left,
-      //       doc.page.height - 50,
-      //       {
-      //         align: 'center',
-      //         width: pageWidth
-      //       }
-      //     );
-      // }
-  
-      doc.end();
+
+        let buffers = [];
+        doc.on('data', (chunk) => buffers.push(chunk));
+        doc.on('end', () => {
+            const pdfData = Buffer.concat(buffers);
+            res
+                .writeHead(200, {
+                    'Content-Length': Buffer.byteLength(pdfData),
+                    'Content-Type': 'application/pdf',
+                    'Content-Disposition': `attachment;filename=receipt-${firstName}-${lastName}-${applicantId}.pdf`,
+                })
+                .end(pdfData);
+        });
+
+        const pageWidth = doc.page.width - 2 * doc.page.margins.left;
+
+        // Add main border to the entire page
+        doc
+            .lineWidth(2)
+            .strokeColor('#000000')
+            .rect(doc.page.margins.left - 10, doc.page.margins.top - 10, 
+                  pageWidth + 20, doc.page.height - 2 * doc.page.margins.top + 20)
+            .stroke();
+
+        const colors = {
+            primary: '#8B4513',     // Saddle Brown
+            secondary: '#DEB887',   // Burly Wood
+            accent: '#CD853F',      // Peru
+            background: '#FFF8DC',  // Cornsilk
+            text: '#4A3728',        // Dark Brown
+            highlight: '#FFE4B5'    // Moccasin
+        };
+
+        // Header section
+        doc
+            .rect(doc.page.margins.left, doc.page.margins.top, pageWidth, 120)
+            .fill(colors.background);
+
+        doc
+            .lineWidth(3)
+            .strokeColor(colors.accent)
+            .roundedRect(doc.page.margins.left - 5, doc.page.margins.top - 5, pageWidth + 10, 130, 10)
+            .stroke();
+
+        // Contact information at top right
+        const rightAlign = doc.page.width - doc.page.margins.right - 100;
+        doc
+            .fontSize(9)
+            .font('Helvetica')
+            .fillColor(colors.text)
+            .text('+91 89711 33673', rightAlign, doc.page.margins.top + 10)
+            .text('contact@quantumkids.in', rightAlign, doc.page.margins.top + 25)
+            .text('www.quantumkids.in', rightAlign, doc.page.margins.top + 40);
+
+        // School name and title
+        doc
+            .fontSize(24)
+            .font('Helvetica-Bold')
+            .fillColor(colors.primary)
+            .text('QUANTUM KIDS', doc.page.margins.left, doc.page.margins.top + 20, 
+                  { align: 'center', width: pageWidth });
+
+        doc
+            .fontSize(12)
+            .font('Helvetica')
+            .text('Preschool and Daycare', { align: 'center', width: pageWidth })
+            .moveDown(0.5);
+
+        doc
+            .fontSize(14)
+            .fillColor(colors.text)
+            .text('Fee Receipt', { align: 'center', width: pageWidth })
+            .moveDown(1);
+
+        // Generate receipt ID
+        const timestamp = new Date().getTime();
+        const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const receiptId = `REC-${timestamp}-${randomString}`;
+
+        // Receipt Details Section - Now properly positioned after the header
+        const detailsY = doc.page.margins.top + 140; // Adjusted position
+        doc
+            .rect(doc.page.margins.left, detailsY, pageWidth, 80)
+            .fill(colors.highlight)
+            .strokeColor(colors.accent)
+            .stroke();
+
+        // Receipt details content
+        doc
+            .fontSize(10)
+            .font('Helvetica-Bold')
+            .fillColor(colors.text);
+
+        // ID Details with proper spacing
+        const detailsStartY = detailsY + 15;
+        doc
+            .text('Receipt ID:', doc.page.margins.left + 20, detailsStartY)
+            .font('Helvetica')
+            .text(receiptId, doc.page.margins.left + 120, detailsStartY);
+
+        doc
+            .font('Helvetica-Bold')
+            .text('Custom ID:', doc.page.margins.left + 20, detailsStartY + 20)
+            .font('Helvetica')
+            .text(customId, doc.page.margins.left + 120, detailsStartY + 20);
+
+        doc
+            .font('Helvetica-Bold')
+            .text('Applicant ID:', doc.page.margins.left + 20, detailsStartY + 40)
+            .font('Helvetica')
+            .text(applicantId, doc.page.margins.left + 120, detailsStartY + 40);
+
+        // Main Content Table - Positioned after details section
+        const startY = detailsY + 100;
+        const rowHeight = 25;
+        const colWidth = pageWidth / 2;
+
+        // Define table data
+        const tableData = [
+            ['Description', 'Amount/Date'],
+            ['Name', `${firstName} ${lastName}`],
+            ['Program', program],
+            ['Parent Name', `${feeReceipt.parentName}`],
+            ['Payment Mode', `${feeReceipt.paymentMode}`],
+            ['Transaction Id', `${feeReceipt.transactionId || 'N/A'}`],
+        ];
+
+        // Add installment information based on installmentNumber
+        if (installmentNumber === '1' || installmentNumber === '123') {
+            tableData.push(['First Installment', `${feeReceipt.firstInstallment || 'pending'}`]);
+            tableData.push(['First Installment Date', `${feeReceipt.firstInstallmentDate || 'N/A'}`]);
+        }
+        if (installmentNumber === '2' || installmentNumber === '23' || installmentNumber === '123') {
+            tableData.push(['Second Installment', `${feeReceipt.secondInstallment || 'pending'}`]);
+            tableData.push(['Second Installment Date', `${feeReceipt.secondInstallmentDate || 'N/A'}`]);
+        }
+        if (installmentNumber === '3' || installmentNumber === '23' || installmentNumber === '123') {
+            tableData.push(['Third Installment', `${feeReceipt.thirdInstallment || 'pending'}`]);
+            tableData.push(['Third Installment Date', `${feeReceipt.thirdInstallmentDate || 'N/A'}`]);
+        }
+
+        // Add total payments
+        tableData.push(['Total Yearly Payment', `${feeReceipt.totalYearlyPayment || 'N/A'}`]);
+        tableData.push(['Total Pending Fee', `${feeReceipt.pendingFee || 'N/A'}`]);
+
+        // Draw table
+        let currentY = startY;
+        tableData.forEach((row, i) => {
+          const isHeader = i === 0;
+          const isEven = i % 2 === 0;
+      
+          // Draw row background
+          if (!isHeader) {
+              doc
+                  .rect(doc.page.margins.left, currentY, pageWidth, rowHeight)
+                  .fill(isEven ? colors.background : '#FFFFFF');
+          } else {
+              doc
+                  .rect(doc.page.margins.left, currentY, pageWidth, rowHeight)
+                  .fill(colors.secondary);
+          }
+      
+          // Draw cell content
+          doc
+              .font(isHeader ? 'Helvetica-Bold' : 'Helvetica')
+              .fontSize(isHeader ? 11 : 10)
+              .fillColor(colors.text)
+              .text(row[0], doc.page.margins.left + 10, currentY + 7, { // First column
+                  width: colWidth - 20,
+              })
+              .text(row[1], doc.page.margins.left + colWidth + 10, currentY + 7, { // Second column with padding
+                  width: colWidth - 30,
+              });
+      
+          // Draw vertical line between columns
+          doc
+              .moveTo(doc.page.margins.left + colWidth, currentY)
+              .lineTo(doc.page.margins.left + colWidth, currentY + rowHeight)
+              .stroke();
+      
+          currentY += rowHeight;
+      });
+      
+
+        // Draw table border
+        doc
+            .lineWidth(1)
+            .strokeColor(colors.accent)
+            .rect(doc.page.margins.left, startY, pageWidth, currentY - startY)
+            .stroke();
+
+        // Footer with address - Positioned at bottom
+        const footerY = doc.page.height - 100;
+        doc
+            .rect(doc.page.margins.left, footerY - 10, pageWidth, 60)
+            .fill(colors.background)
+            .strokeColor(colors.accent)
+            .stroke();
+
+        doc
+            .fontSize(8)
+            .font('Helvetica')
+            .fillColor(colors.text)
+            .text(
+                `Generated on: ${new Date().toLocaleDateString()} | Receipt ID: ${receiptId}`,
+                doc.page.margins.left,
+                footerY,
+                { width: pageWidth, align: 'center' }
+            )
+            .text(
+                '58, Sy No.25, Sompura Village, Sarjapura Hobil, Anekal Taluk, Bangalore-562125',
+                doc.page.margins.left,
+                footerY + 20,
+                { width: pageWidth, align: 'center' }
+            )
+            .text(
+                'Landmark: Next To ARS SIGNATURE PHASE 2',
+                doc.page.margins.left,
+                footerY + 35,
+                { width: pageWidth, align: 'center' }
+            );
+
+        doc.end();
     } catch (error) {
-      console.error('PDF Generation Error:', error);
-      throw new InternalServerErrorException('Failed to generate PDF');
+        console.error('PDF Generation Error:', error);
+        throw new InternalServerErrorException('Failed to generate PDF');
     }
-  }
+}
+
+
    async getFeeDetails(): Promise<FeeSubmit> {
       const [data, totalCount] = await this.feeReceiptGenerateRepository.findAndCount();
       return {

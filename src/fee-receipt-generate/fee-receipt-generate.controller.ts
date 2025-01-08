@@ -69,9 +69,11 @@ export class FeeReceiptGenerateController {
   @ApiOperation({ summary: 'Get Fee Receipt as PDF' })
   @ApiResponse({ status: 200, description: 'PDF file generated successfully!' })
   async getReceipt( @Query('customId') customId: string,
-  @Query('applicantId') applicantId: string, @Res() res: Response) {
+  @Query('applicantId') applicantId: string,
+  @Query('installmentNumber') installmentNumber: string,
+  @Res() res: Response) {
     try {
-      await this.feeReceiptGenerateService.getReceipt(customId,applicantId, res);
+      await this.feeReceiptGenerateService.getReceipt(customId,applicantId,installmentNumber, res);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
