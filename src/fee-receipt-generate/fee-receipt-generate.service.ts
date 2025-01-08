@@ -206,7 +206,10 @@ export class FeeReceiptGenerateService {
       const tableData = [
         ['Description', 'Amount/Date'],
         ['Name', `${feeReceipt.firstName + ' ' + feeReceipt.lastName}`],
-        ['Class', `${feeReceipt.class}`],
+        ['Program', `${feeReceipt.program}`],
+        ['Parent Name', `${feeReceipt.parentName}`],
+        ['Payment Mode', `${feeReceipt.paymentMode}`],
+        ['Transition Id', `${feeReceipt.transactionId}`],
         ['First Installment', `${feeReceipt.firstInstallment || 'pending'}`],
         ['First Installment Date', `${feeReceipt.firstInstallmentDate || 'N/A'}`],
         ['Second Installment', `${feeReceipt.secondInstallment || 'pending'}`],
