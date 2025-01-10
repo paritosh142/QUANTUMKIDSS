@@ -13,8 +13,8 @@ export class NewsEventService {
 
   async createNewsEvent(dto: CreateNewsEventDto): Promise<NewsEvent> {
     const newsEvent = this.newsEventRepository.create(dto);
-    if (dto.imageUrl) {
-      newsEvent.imageUrl = dto.imageUrl;
+    if (dto.imageUrls && dto.imageUrls.length > 0) {
+      newsEvent.imageUrls = dto.imageUrls;
     }
     return this.newsEventRepository.save(newsEvent);
   }
@@ -22,8 +22,8 @@ export class NewsEventService {
   async updateNewsEvent(id: number, dto: UpdateNewsEventDto): Promise<NewsEvent> {
     const newsEvent = await this.newsEventRepository.preload({ id, ...dto });
     if (!newsEvent) throw new NotFoundException('News/Event not found');
-    if (dto.imageUrl) {
-      newsEvent.imageUrl = dto.imageUrl;
+    if (dto.imageUrls) {
+      newsEvent.imageUrls = dto.imageUrls;
     }
     return this.newsEventRepository.save(newsEvent);
   }
