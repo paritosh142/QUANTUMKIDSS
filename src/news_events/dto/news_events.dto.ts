@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsDate } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsDate, IsArray } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
@@ -13,10 +13,10 @@ export class CreateNewsEventDto {
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty({ description: 'The URL of the image', required: false })
-  @IsString()
+  @ApiProperty({ description: 'The URLs of the images', required: false, type: [String] })
+  @IsArray()
   @IsOptional()
-  imageUrl?: string;
+  imageUrls?: string[];
 
   @ApiProperty({ description: 'The date of the event', required: false })
   @IsDate()
@@ -36,10 +36,10 @@ export class UpdateNewsEventDto {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ description: 'The URL of the image', required: false })
-  @IsString()
+  @ApiProperty({ description: 'The URLs of the images', required: false, type: [String] })
+  @IsArray()
   @IsOptional()
-  imageUrl?: string;
+  imageUrls?: string[];
 
   @ApiProperty({ description: 'The date of the event', required: false })
   @IsDate()

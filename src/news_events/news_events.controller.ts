@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, HttpCode, HttpStatus, UploadedFile, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Put, Delete, HttpCode, HttpStatus, UseInterceptors, UsePipes, ValidationPipe, UploadedFiles, Patch } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiConsumes } from '@nestjs/swagger';
 import { NewsEventService } from './news_events.service';
 import { CreateNewsEventDto, UpdateNewsEventDto } from './dto/news_events.dto';
 import { NewsEvent } from './schema/news_events.entity';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
@@ -14,7 +14,7 @@ export class NewsEventsController {
 
   @Post()
   @UseInterceptors(
-    FileInterceptor('image', {
+    FilesInterceptor('images', 10, { // Allow up to 10 images
       storage: diskStorage({
         destination: './uploads/news-events',
         filename: (req, file, cb) => {
@@ -27,17 +27,68 @@ export class NewsEventsController {
       }),
     }),
   )
+  @ApiConsumes('multipart/form-data')
   @UsePipes(new ValidationPipe())
-  @ApiOperation({ summary: 'Create a news or event' })
+  @ApiOperation({ summary: 'Create a news or event with multiple images' })
   @ApiResponse({ status: 201, description: 'News/Event created successfully.' })
   async create(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],
     @Body() createNewsEventDto: CreateNewsEventDto,
   ): Promise<NewsEvent> {
-    if (file) {
-      createNewsEventDto.imageUrl = `/uploads/news-events/${file.filename}`;
+    if (files && files.length > 0) {
+      createNewsEventDto.imageUrls = files.map(
+        file => `/uploads/news-events/${file.filename}`,
+      );
     }
     return this.newsEventService.createNewsEvent(createNewsEventDto);
+  }
+
+  @Put(':id')
+  @UseInterceptors(
+    FilesInterceptor('images', 10, {
+      storage: diskStorage({
+        destination: './uploads/news-events',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  @Patch(':id')
+  @UseInterceptors(
+    FilesInterceptor('images', 10, {
+      storage: diskStorage({
+        destination: './uploads/news-events',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @UsePipes(new ValidationPipe())
+  @ApiOperation({ summary: 'Partially update a news/event by ID' })
+  @ApiResponse({ status: 200, description: 'News/Event updated successfully.' })
+  @ApiResponse({ status: 404, description: 'News/Event not found.' })
+  async patch(
+    @Param('id') id: number,
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() updateNewsEventDto: Partial<UpdateNewsEventDto>,
+  ): Promise<NewsEvent> {
+    if (files && files.length > 0) {
+      updateNewsEventDto.imageUrls = files.map(
+        (file) => `/uploads/news-events/${file.filename}`,
+      );
+    }
+    return this.newsEventService.updateNewsEvent(id, updateNewsEventDto);
   }
 
   @Get()
@@ -55,35 +106,7 @@ export class NewsEventsController {
     return this.newsEventService.getNewsEventById(id);
   }
 
-  @Put(':id')
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './uploads/news-events',
-        filename: (req, file, cb) => {
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          cb(null, `${randomName}${extname(file.originalname)}`);
-        },
-      }),
-    }),
-  )
-  @UsePipes(new ValidationPipe())
-  @ApiOperation({ summary: 'Update a news/event by ID' })
-  @ApiResponse({ status: 200, description: 'News/Event updated successfully.' })
-  @ApiResponse({ status: 404, description: 'News/Event not found.' })
-  async update(
-    @Param('id') id: number,
-    @UploadedFile() file: Express.Multer.File,
-    @Body() updateNewsEventDto: UpdateNewsEventDto,
-  ): Promise<NewsEvent> {
-    if (file) {
-      updateNewsEventDto.imageUrl = `/uploads/news-events/${file.filename}`;
-    }
-    return this.newsEventService.updateNewsEvent(id, updateNewsEventDto);
-  }
+  
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
