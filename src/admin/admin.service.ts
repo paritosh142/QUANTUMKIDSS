@@ -88,20 +88,23 @@ export class AdminService {
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    const { token, newPassword } = resetPasswordDto;
+    const { currentPassword, newPassword } = resetPasswordDto;
 
     const admin = await this.adminRepository.findOne({
-      where: { resetToken: token, resetTokenExpiration: TypeOrmMoreThan(new Date()) },
+      where: { username: resetPasswordDto.username },
     });
 
     if (!admin) {
-      throw new BadRequestException('Invalid or expired reset token');
+      throw new NotFoundException('Admin not found');
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    admin.password = hashedPassword;
-    admin.resetToken = null;
-    admin.resetTokenExpiration = null;
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, admin.password);
+    if (!isCurrentPasswordValid) {
+      throw new UnauthorizedException('Invalid current password');
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    admin.password = hashedNewPassword;
     await this.adminRepository.save(admin);
 
     return { message: 'Password reset successfully' };
