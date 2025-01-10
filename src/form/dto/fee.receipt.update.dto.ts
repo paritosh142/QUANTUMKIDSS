@@ -15,7 +15,12 @@ export class FeeReceiptUpdateDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  class: string;
+  program: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  parentName: string;
 
   @ApiProperty()
   @IsEmail()

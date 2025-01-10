@@ -1,47 +1,73 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNotEmpty, IsString, Matches } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  Matches,
+} from 'class-validator';
 
 export class CreateFormDto {
   @ApiProperty({ description: 'First name of the lead' })
   @IsString()
   @IsNotEmpty()
   firstName: string;
+  @ApiProperty({ description: 'First name of the lead' })
+  @IsString()
+  @IsNotEmpty()
+  lastName: string;
 
   @ApiProperty({ description: 'Last name of the lead' })
   @IsString()
   @IsNotEmpty()
-  lastName: string;
+  parentName: string;
+
+  @ApiProperty({ description: 'Last name of the lead' })
+  @IsString()
+  @IsNotEmpty()
+  location: string;
 
   @ApiProperty({ description: 'Email address of the lead' })
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ description: 'Residential address of the lead' })
-  @IsString()
-  @IsNotEmpty()
-  address: string;
-
   @ApiProperty({ description: 'Mobile number in E.164 format' })
-  @Matches(/^\+?[1-9]\d{1,14}$/, { message: 'Mobile number must be in valid E.164 format.' })
+  @Matches(/^\+?[1-9]\d{1,14}$/, {
+    message: 'Mobile number must be in valid E.164 format.',
+  })
   @IsNotEmpty()
   mobileNumber: string;
 
   @ApiProperty({
     description: 'Category of the inquiry',
-    enum: ['Admission', 'Fee', 'Curriculum/Program', 'Other'],
+    enum: ['Daycare', 'Playgroup','Nursery', 'LKG', 'UKG'],
   })
-  @IsEnum(['Admission', 'Fee', 'Curriculum/Program', 'Other'])
+  @IsEnum(['Daycare', 'Playgroup','Nursery', 'LKG', 'UKG'])
   @IsNotEmpty()
-  category: string;
+  program: string;
 
   @ApiProperty({
     description: 'Current status or type of the lead',
-    enum: ['raw', 'interested', 'converted', 'pending', 'notInterested', "visitScheduled" ,],
+    enum: [
+      'raw',
+      'interested',
+      'converted',
+      'pending',
+      'notInterested',
+      'visitScheduled',
+    ],
     default: 'raw',
   })
-  @IsEnum(['raw', 'interested', 'converted', 'pending', 'notInterested', "visitScheduled" ,"formFilled",
-      "admitted"])
+  @IsEnum([
+    'raw',
+    'interested',
+    'converted',
+    'pending',
+    'notInterested',
+    'visitScheduled',
+    'formFilled',
+    'admitted',
+  ])
   type: string = 'raw';
-  
 }

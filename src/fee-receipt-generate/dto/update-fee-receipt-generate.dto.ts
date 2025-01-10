@@ -17,6 +17,29 @@ export class UpdateFeeReceiptGenerateDto {
   customId: string;
 
   @ApiProperty({
+    description: 'Enter Unique Transition Id',
+  })
+  @IsString()
+  @IsNotEmpty()
+  transactionId:string;
+      
+
+  @ApiProperty({
+    description: 'Select Payment Mode',
+  })
+  @IsString()
+  @IsNotEmpty()
+  paymentMode: string;
+
+  @ApiProperty({
+    description: 'Select Payment Mode',
+  })
+  @IsString()
+  @IsNotEmpty()
+  parentName: string;
+
+
+  @ApiProperty({
     description: 'Amount of the first installment',
     required: false,
   })
@@ -91,12 +114,20 @@ export class UpdateFeeReceiptGenerateDto {
   lastName?: string;
 
   @ApiProperty({
+    description: 'installment number',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  installmentNumber?: string;
+
+  @ApiProperty({
     description: 'Class',
     required: false,
   })
   @IsString()
   @IsOptional()
-  class?: string;
+  program?: string;
 
   @ApiProperty()
   @IsString()

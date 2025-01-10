@@ -11,8 +11,8 @@ export class NewsEvent {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  imageUrl?: string;
+  @Column('simple-array', { nullable: true })
+  imageUrls: string[];
 
   @Column({ type: 'datetime', nullable: true })
   eventDate?: Date;

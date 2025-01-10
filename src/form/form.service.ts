@@ -262,7 +262,7 @@ export class FormService {
     return csvData;
   }
   async getDataByClassName(classs: string): Promise<StudentForm[]> {
-    const resp = await this.studentFormRepository.find({ where: { class: classs } });
+    const resp = await this.studentFormRepository.find({ where: { program: classs } });
     if(resp){
       return resp;
     }
@@ -308,7 +308,7 @@ export class FormService {
   }
 
   async getByClassName(className:string):Promise<FeeReceiptSchema>{
-    const findData = await this.feeReceiptRepository.findOne({where:{class:className}});
+    const findData = await this.feeReceiptRepository.findOne({where:{program:className}});
     if(findData){
       return findData;
     }
