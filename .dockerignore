@@ -1,0 +1,26 @@
+# Node modules (you don't need them because you're installing them in the Dockerfile)
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+dist
+# Node modules (you don't need them because you're installing them in the Dockerfile)
+node_modules
+# Logs
+logs
+*.log
+
+# Temporary files and build artifacts
+dist
+temp
+*.tmp
+
+# Environment variables and secrets
+.env
+.env.local
+.env.test
+.env.production
+
+# IDE/editor files
+.vscode
+.idea
