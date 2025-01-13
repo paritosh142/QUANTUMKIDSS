@@ -31,7 +31,7 @@ import { FeeReceiptGenerate } from './fee-receipt-generate/entities/fee-receipt-
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: '148.72.247.10',
+      host: '208.109.214.146',
       port: 3306, 
       username: 'developersqk_2025',
       password: 'QuantumKids@2025!',
