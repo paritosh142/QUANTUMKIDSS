@@ -3,9 +3,12 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import {Logger} from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);  
+  const app = await NestFactory.create<NestExpressApplication>(AppModule , {
+    logger: ['log', 'error', 'warn', 'debug', 'verbose'], // Enable all log levels
+  });  
   app.enableCors({
     origin: true, // Allow all origins
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', 
@@ -23,5 +26,6 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   await app.listen(3002);
+  Logger.log('Application is running on http://localhost:3000');
 }
 bootstrap();
