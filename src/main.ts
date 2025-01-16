@@ -10,8 +10,9 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'], // Enable all log levels
   });  
   app.enableCors({
-    origin: true, // Allow all origins
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', 
+    origin: '*', // Allow all origins
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS', // Allow all methods
+    allowedHeaders: '*', // Allow all headers
     credentials: true, 
   });
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
@@ -26,6 +27,6 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   await app.listen(3002);
-  Logger.log('Application is running on http://localhost:3000');
+  Logger.log('Application is running on http://localhost:3002');
 }
 bootstrap();
